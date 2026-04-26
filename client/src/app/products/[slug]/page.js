@@ -166,3 +166,4 @@ export default function ProductDetailPage({ params }) {
     </main>
   );
 }
+

@@ -9,19 +9,19 @@ const HERO_SLIDES = [
     id: 1,
     title: "Beyond Purification",
     subtitle: "Advanced Water Healthifier",
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
+    image: "/images/hero/purifier.png",
   },
   {
     id: 2,
     title: "i-Auto Clean Technology",
     subtitle: "Modern Smart Chimneys",
-    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070&auto=format&fit=crop",
+    image: "/images/hero/chimney.png",
   },
   {
     id: 3,
     title: "Modular Elegance",
     subtitle: "Bespoke Kitchen Solutions",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop",
+    image: "/images/hero/hob.png",
   }
 ];
 
@@ -98,6 +98,7 @@ export default function HeroSection() {
     </section>
   );
 }
+
 
 
 

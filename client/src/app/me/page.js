@@ -96,28 +96,6 @@ export default function UserDashboard() {
                   <User size={18} />
                   Profile
                 </button>
-                <button
-                  onClick={() => setActiveTab('security')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition ${
-                    activeTab === 'security'
-                      ? 'bg-brand text-white'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Lock size={18} />
-                  Security
-                </button>
-                <button
-                  onClick={() => setActiveTab('preferences')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition ${
-                    activeTab === 'preferences'
-                      ? 'bg-brand text-white'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Settings size={18} />
-                  Preferences
-                </button>
               </nav>
 
               {}
@@ -325,5 +303,6 @@ export default function UserDashboard() {
     </div>
   )
 }
+
 
 

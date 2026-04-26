@@ -62,7 +62,7 @@ export const SAMPLE_PRODUCTS = [
       { label: "Control", value: "Touch + Motion Sensor" },
       { label: "Noise Level", value: "58 dB" },
     ],
-    images: ["/images/placeholder-product.svg"],
+    images: ["/images/hero/chimney.png"],
   },
   {
     name: "Kutchina Atlas 3B Built-in Hob",
@@ -77,7 +77,7 @@ export const SAMPLE_PRODUCTS = [
       { label: "Ignition", value: "Auto Electric" },
       { label: "Knobs", value: "Metal Alloy" },
     ],
-    images: ["/images/placeholder-product.svg"],
+    images: ["/images/hero/hob.png"],
   },
   {
     name: "Kutchina Aqua Fresh Water Purifier",
@@ -92,7 +92,7 @@ export const SAMPLE_PRODUCTS = [
       { label: "Stages", value: "7-Stage" },
       { label: "TDS Range", value: "Up to 2000 ppm" },
     ],
-    images: ["/images/placeholder-product.svg"],
+    images: ["/images/hero/purifier.png"],
   },
   {
     name: "Kutchina Vento DX Dishwasher",
@@ -107,7 +107,7 @@ export const SAMPLE_PRODUCTS = [
       { label: "Type", value: "Free Standing" },
       { label: "Energy Rating", value: "A++" },
     ],
-    images: ["/images/placeholder-product.svg"],
+    images: ["/images/hero/dishwasher.png"],
   },
   {
     name: "Kutchina Elite 60 Built-in Oven",
@@ -148,5 +148,6 @@ export const NAV_LINKS = [
   { label: "About Us", href: "/about" },
   { label: "Contact Us", href: "/contact" },
 ];
+
 
 
