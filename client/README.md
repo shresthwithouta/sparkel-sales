@@ -1,4 +1,4 @@
-# Sparkel Sales
+# Spark Innovations
 
 This is the frontend client for Sparkel Sales, built with [Next.js](https://nextjs.org).
 
