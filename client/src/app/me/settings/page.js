@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { ChevronLeft, Save, AlertCircle, CheckCircle } from 'lucide-react'
 
 export default function UserSettings() {
   const { user, loading, isAuthenticated } = useAuth()
@@ -34,19 +34,12 @@ export default function UserSettings() {
 
 function SettingsForm({ user }) {
   const [formData, setFormData] = useState({ name: user.name || '', email: user.email || '' })
-  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
-  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false })
   const [message, setMessage] = useState({ type: '', text: '' })
   const [isSaving, setIsSaving] = useState(false)
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target
-    setPasswordData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSaveProfile = async (e) => {
@@ -57,36 +50,6 @@ function SettingsForm({ user }) {
       setTimeout(() => setMessage({ type: '', text: '' }), 5000)
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to update profile' })
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault()
-    
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'All fields are required' })
-      return
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'New passwords do not match' })
-      return
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'Password must be at least 6 characters' })
-      return
-    }
-
-    setIsSaving(true)
-    try {
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
-      setMessage({ type: 'success', text: 'Password changed successfully!' })
-      setTimeout(() => setMessage({ type: '', text: '' }), 5000)
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to change password' })
     } finally {
       setIsSaving(false)
     }
@@ -160,13 +123,7 @@ function SettingsForm({ user }) {
             </button>
           </form>
         </div>
-
-        </div>
-      </div>
-    </div>
       </div>
     </div>
   )
 }
-
-
