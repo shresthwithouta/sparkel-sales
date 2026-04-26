@@ -25,22 +25,13 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    // Dynamically use the deployed backend URL or fallback to local dev
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:4000';
+    
     return [
       {
-        source: '/api/auth/:path*',
-        destination: 'http://localhost:4000/api/auth/:path*',
-      },
-      {
-        source: '/api/products/:path*',
-        destination: 'http://localhost:4000/api/products/:path*',
-      },
-      {
-        source: '/api/categories/:path*',
-        destination: 'http://localhost:4000/api/categories/:path*',
-      },
-      {
-        source: '/api/inquiries/:path*',
-        destination: 'http://localhost:4000/api/inquiries/:path*',
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
