@@ -74,3 +74,19 @@ export const googleAuth = async (req, res) => {
 export const getMe = (req, res) => {
   res.json({ user: req.user })
 }
+
+export const updateMe = async (req, res) => {
+  const { name, email } = req.body
+
+  if (email && email !== req.user.email) {
+    const existing = await User.findOne({ email })
+    if (existing) return res.status(409).json({ message: 'Email already in use' })
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { ...(name && { name }), ...(email && { email }) },
+    { new: true, runValidators: true }
+  )
+  res.json({ user })
+}
