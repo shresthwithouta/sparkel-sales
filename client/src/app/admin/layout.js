@@ -25,6 +25,7 @@ export default function AdminLayout({ children }) {
     { icon: <Tags size={20} />, label: "Categories", href: "/admin/categories" },
     { icon: <MessageSquare size={20} />, label: "Inquiries", href: "/admin/inquiries" },
     { icon: <ImageIcon size={20} />, label: "Banners", href: "/admin/banners" },
+    { icon: <Settings size={20} />, label: "Site Settings", href: "/admin/settings" },
   ];
 
   return (

@@ -6,6 +6,7 @@ import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { WishlistProvider } from "@/contexts/WishlistContext";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -37,12 +38,14 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <GoogleAuthProvider>
             <CartProvider>
-              <SmoothScroll>
-                <Navbar />
-                <main>{children}</main>
-                <Footer />
-                <WhatsAppFloat />
-              </SmoothScroll>
+              <WishlistProvider>
+                <SmoothScroll>
+                  <Navbar />
+                  <main>{children}</main>
+                  <Footer />
+                  <WhatsAppFloat />
+                </SmoothScroll>
+              </WishlistProvider>
             </CartProvider>
           </GoogleAuthProvider>
         </AuthProvider>

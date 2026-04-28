@@ -42,6 +42,18 @@ function SettingsForm({ user }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  const [addressData, setAddressData] = useState({ 
+    street: user.address?.street || '', 
+    city: user.address?.city || '', 
+    state: user.address?.state || '', 
+    zipCode: user.address?.zipCode || '' 
+  })
+
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target
+    setAddressData(prev => ({ ...prev, [name]: value }))
+  }
+
   const handleSaveProfile = async (e) => {
     e.preventDefault()
     setIsSaving(true)
@@ -120,6 +132,68 @@ function SettingsForm({ user }) {
             >
               <Save size={18} />
               {isSaving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </form>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-brand-blue mb-6">Delivery Address</h2>
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Street Address</label>
+              <input
+                type="text"
+                name="street"
+                value={addressData.street}
+                onChange={handleAddressChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                placeholder="123 Main St, Apt 4B"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={addressData.city}
+                  onChange={handleAddressChange}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                  placeholder="Kolkata"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">State</label>
+                <input
+                  type="text"
+                  name="state"
+                  value={addressData.state}
+                  onChange={handleAddressChange}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                  placeholder="West Bengal"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">PIN Code</label>
+              <input
+                type="text"
+                name="zipCode"
+                value={addressData.zipCode}
+                onChange={handleAddressChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                placeholder="700001"
+              />
+            </div>
+
+            <button
+              type="button"
+              className="flex items-center gap-2 px-6 py-2 bg-brand text-white rounded-lg font-semibold hover:bg-brand-dark transition disabled:opacity-50"
+            >
+              <Save size={18} />
+              Save Address
             </button>
           </form>
         </div>

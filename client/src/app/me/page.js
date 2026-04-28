@@ -11,12 +11,15 @@ import {
   ShoppingBag, 
   MapPin, 
   LogOut,
+  LogOut,
   Calendar,
   Edit2
 } from 'lucide-react'
+import { useWishlist } from '@/contexts/WishlistContext'
 
 export default function UserDashboard() {
   const { user, loading, logout, isAuthenticated } = useAuth()
+  const { wishlistCount } = useWishlist()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -40,7 +43,7 @@ export default function UserDashboard() {
   if (!isAuthenticated) return null
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 py-12">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 pt-32 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-black text-brand-blue uppercase tracking-tight mb-2">
@@ -122,7 +125,7 @@ export default function UserDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-slate-600 text-sm font-medium">Wishlist Items</p>
-                        <p className="text-3xl font-black text-brand-blue mt-1">0</p>
+                        <p className="text-3xl font-black text-brand-blue mt-1">{wishlistCount}</p>
                       </div>
                       <Heart size={40} className="text-slate-200" />
                     </div>
@@ -191,14 +194,25 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-slate-200">
-                  <h4 className="font-bold text-brand-blue mb-4">Saved Addresses</h4>
-                  <div className="text-center py-8 bg-slate-50 rounded-lg">
-                    <MapPin size={40} className="text-slate-300 mx-auto mb-2" />
-                    <p className="text-slate-500 mb-4">No addresses saved yet</p>
-                    <button className="px-4 py-2 bg-brand text-white rounded-lg font-semibold hover:bg-brand-dark transition text-sm">
-                      Add Address
-                    </button>
-                  </div>
+                  <h4 className="font-bold text-brand-blue mb-4">Delivery Address</h4>
+                  {user?.address?.street ? (
+                    <div className="bg-slate-50 p-4 rounded-lg flex items-start gap-4">
+                      <MapPin className="text-brand mt-1 shrink-0" size={20} />
+                      <div>
+                        <p className="font-semibold text-slate-800">{user.name}</p>
+                        <p className="text-slate-600 mt-1">{user.address.street}</p>
+                        <p className="text-slate-600">{user.address.city}, {user.address.state} {user.address.zipCode}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-slate-50 rounded-lg">
+                      <MapPin size={40} className="text-slate-300 mx-auto mb-2" />
+                      <p className="text-slate-500 mb-4">No addresses saved yet</p>
+                      <Link href="/me/settings" className="inline-block px-4 py-2 bg-brand text-white rounded-lg font-semibold hover:bg-brand-dark transition text-sm">
+                        Add Address
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

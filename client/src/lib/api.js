@@ -144,6 +144,106 @@ export const fetchUserMe = async (token) => {
   return res.json();
 };
 
+export const createInquiry = async (inquiryData) => {
+  const res = await fetch(`${API_URL}/inquiries`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(inquiryData),
+  });
+  if (!res.ok) throw new Error('Failed to create inquiry');
+  return res.json();
+};
+
+export const updateInquiryStatus = async (id, status) => {
+  const res = await fetch(`${API_URL}/inquiries/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Failed to update inquiry status');
+  return res.json();
+};
+
+export const updateUserProfile = async (token, profileData) => {
+  const res = await fetch(`${API_URL}/auth/me`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(profileData),
+  });
+  if (!res.ok) throw new Error('Failed to update profile');
+  return res.json();
+};
+
+export const createOrder = async (token, orderData) => {
+  const res = await fetch(`${API_URL}/orders`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(orderData),
+  });
+  if (!res.ok) throw new Error('Failed to create order');
+  return res.json();
+};
+
+export const fetchUserOrders = async (token) => {
+  const res = await fetch(`${API_URL}/orders/me`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res.ok) return { orders: [] };
+  return res.json();
+};
+
+export const fetchBanners = async () => {
+  try {
+    const res = await fetch(`${API_URL}/settings/banners`);
+    if (!res.ok) return { banners: [] };
+    return res.json();
+  } catch (error) {
+    return { banners: [] };
+  }
+};
+
+export const updateBanner = async (token, id, bannerData) => {
+  const res = await fetch(`${API_URL}/settings/banners/${id}`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(bannerData),
+  });
+  if (!res.ok) throw new Error('Failed to update banner');
+  return res.json();
+};
+
+export const fetchSiteSettings = async () => {
+  try {
+    const res = await fetch(`${API_URL}/settings/site`);
+    if (!res.ok) return { settings: null };
+    return res.json();
+  } catch (error) {
+    return { settings: null };
+  }
+};
+
+export const updateSiteSettings = async (token, settingsData) => {
+  const res = await fetch(`${API_URL}/settings/site`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(settingsData),
+  });
+  if (!res.ok) throw new Error('Failed to update site settings');
+  return res.json();
+};
+
 
 
 
