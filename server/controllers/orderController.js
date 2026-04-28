@@ -22,8 +22,16 @@ export const placeOrder = async (req, res) => {
 }
 
 export const getMyOrders = async (req, res) => {
-  const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 })
-  res.json({ orders })
+  const page = Math.max(1, parseInt(req.query.page) || 1)
+  const limit = Math.min(50, parseInt(req.query.limit) || 10)
+  const skip = (page - 1) * limit
+
+  const [orders, total] = await Promise.all([
+    Order.find({ user: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Order.countDocuments({ user: req.user._id }),
+  ])
+
+  res.json({ orders, total, page, pages: Math.ceil(total / limit) })
 }
 
 export const getOrderById = async (req, res) => {
@@ -33,12 +41,22 @@ export const getOrderById = async (req, res) => {
 }
 
 export const getAllOrders = async (req, res) => {
-  const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 })
-  res.json({ orders })
+  const page = Math.max(1, parseInt(req.query.page) || 1)
+  const limit = Math.min(100, parseInt(req.query.limit) || 20)
+  const skip = (page - 1) * limit
+
+  const [orders, total] = await Promise.all([
+    Order.find().populate('user', 'name email').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Order.countDocuments(),
+  ])
+
+  res.json({ orders, total, page, pages: Math.ceil(total / limit) })
 }
 
 export const updateOrderStatus = async (req, res) => {
   const { status } = req.body
+  if (!status) return res.status(400).json({ message: 'status is required' })
+
   const order = await Order.findByIdAndUpdate(
     req.params.id,
     { status },
