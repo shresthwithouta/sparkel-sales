@@ -77,16 +77,26 @@ export const getMe = (req, res) => {
 }
 
 export const updateProfile = async (req, res) => {
-  const { name, email } = req.body
+  const { name, email, phone, address } = req.body
 
   if (email && email !== req.user.email) {
     const existing = await User.findOne({ email })
     if (existing) return res.status(409).json({ message: 'Email already in use' })
   }
 
+  const updates = {}
+  if (name) updates.name = name
+  if (email) updates.email = email
+  if (phone !== undefined) updates.phone = phone
+  if (address && typeof address === 'object') {
+    for (const [key, val] of Object.entries(address)) {
+      if (val !== undefined) updates[`address.${key}`] = val
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user._id,
-    { ...(name && { name }), ...(email && { email }) },
+    { $set: updates },
     { new: true, runValidators: true }
   )
   res.json({ user })
