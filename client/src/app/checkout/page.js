@@ -36,7 +36,9 @@ export default function CheckoutPage() {
     phone: user?.phone || "",
     address: user?.address?.street || "",
     city: user?.address?.city || "",
-    pincode: user?.address?.zipCode || ""
+    state: user?.address?.state || "",
+    zipCode: user?.address?.zipCode || "",
+    country: user?.address?.country || "India"
   });
 
   useEffect(() => {
@@ -54,7 +56,9 @@ export default function CheckoutPage() {
         phone: user.phone || prev.phone,
         address: user.address?.street || prev.address,
         city: user.address?.city || prev.city,
-        pincode: user.address?.zipCode || prev.pincode
+        state: user.address?.state || prev.state,
+        zipCode: user.address?.zipCode || prev.zipCode,
+        country: user.address?.country || prev.country
       }));
     }
   }, [user]);
@@ -83,8 +87,7 @@ export default function CheckoutPage() {
             image: item.images[0]
           })),
           shipping: formData,
-          paymentMethod,
-          total: cartTotal
+          paymentMethod
         });
         setStep(3);
       } catch (err) {
@@ -196,16 +199,27 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Pincode</label>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">PIN Code</label>
                   <input 
                     type="text" 
-                    name="pincode"
-                    value={formData.pincode}
+                    name="zipCode"
+                    value={formData.zipCode}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand text-sm font-medium" 
                     placeholder="700001" 
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Country</label>
+                <input 
+                  type="text" 
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand text-sm font-medium" 
+                  placeholder="India" 
+                />
               </div>
             </div>
 

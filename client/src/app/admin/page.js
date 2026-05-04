@@ -22,7 +22,7 @@ export default function AdminDashboard() {
     { label: "Total Products", value: "0", icon: <Package size={24} />, color: "bg-blue-500", trend: "Loading..." },
     { label: "New Inquiries", value: "0", icon: <MessageSquare size={24} />, color: "bg-brand", trend: "Loading..." },
     { label: "Active Banners", value: "0", icon: <Eye size={24} />, color: "bg-indigo-500", trend: "Loading..." },
-    { label: "Total Users", value: "128", icon: <Users size={24} />, color: "bg-slate-800", trend: "Static" },
+    { label: "Total Users", value: "0", icon: <Users size={24} />, color: "bg-slate-800", trend: "Loading..." },
   ]);
   const [recentInquiries, setRecentInquiries] = useState([]);
   const [loading, setLoading] = useState(true);

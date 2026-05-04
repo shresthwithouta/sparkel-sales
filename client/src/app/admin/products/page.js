@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchProducts, fetchCategories, createProduct, updateProduct, deleteProduct } from "@/lib/api";
+import { fetchProducts, fetchCategories, createProduct, updateProduct, deleteProduct, uploadImage } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Plus, 
@@ -32,6 +32,8 @@ export default function AdminProductsPage() {
     images: [""]
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -60,6 +62,20 @@ export default function AdminProductsPage() {
     (p.category || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProduct = async () => {
     if (!newProduct.name || !newProduct.slug || !newProduct.category) {
       alert("Name, Slug, and Category are required");
@@ -68,22 +84,33 @@ export default function AdminProductsPage() {
 
     try {
       setIsSaving(true);
+      
+      let imageUrls = [...newProduct.images];
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        const uploadRes = await uploadImage(token, formData);
+        imageUrls = [uploadRes.url];
+      }
+
+      const productData = {
+        ...newProduct,
+        images: imageUrls,
+        price: Number(newProduct.price)
+      };
+
       if (editingProduct) {
-        const data = await updateProduct(token, editingProduct.slug, {
-          ...newProduct,
-          price: Number(newProduct.price)
-        });
+        const data = await updateProduct(token, editingProduct.slug, productData);
         setProducts(products.map(p => p.slug === editingProduct.slug ? data.product : p));
       } else {
-        const data = await createProduct(token, {
-          ...newProduct,
-          price: Number(newProduct.price)
-        });
+        const data = await createProduct(token, productData);
         setProducts([...products, data.product]);
       }
       setIsAddingProduct(false);
       setEditingProduct(null);
       setNewProduct({ name: "", slug: "", category: "", price: "", description: "", images: [""] });
+      setImageFile(null);
+      setImagePreview("");
     } catch (err) {
       console.error("Error saving product:", err);
       alert(err.message || "Failed to save product");
@@ -196,6 +223,8 @@ export default function AdminProductsPage() {
                               images: product.images || [""]
                             });
                             setIsAddingProduct(true);
+                            setImagePreview(product.images?.[0] || "");
+                            setImageFile(null);
                           }}
                           className="p-2 text-slate-400 hover:text-brand transition-colors"
                         >
@@ -231,6 +260,8 @@ export default function AdminProductsPage() {
                 onClick={() => {
                   setIsAddingProduct(false);
                   setEditingProduct(null);
+                  setImageFile(null);
+                  setImagePreview("");
                 }} 
                 className="text-slate-400 hover:text-brand"
               >
@@ -283,15 +314,33 @@ export default function AdminProductsPage() {
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Image URL</label>
-                <input 
-                  type="text" 
-                  value={newProduct.images[0]}
-                  onChange={(e) => setNewProduct({ ...newProduct, images: [e.target.value] })}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand transition-all text-sm font-medium" 
-                  placeholder="https://..." 
-                />
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Product Image</label>
+                <div className="flex items-center gap-6">
+                  <div className="w-24 h-24 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
+                    {imagePreview || newProduct.images[0] ? (
+                      <img src={imagePreview || newProduct.images[0]} alt="Preview" className="w-full h-full object-contain" />
+                    ) : (
+                      <ImageIcon className="text-slate-200" size={32} />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden" 
+                      id="product-image"
+                    />
+                    <label 
+                      htmlFor="product-image"
+                      className="inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-sm text-[10px] font-black uppercase tracking-widest cursor-pointer transition-colors"
+                    >
+                      {imageFile ? "Change Image" : "Upload Image"}
+                    </label>
+                    <p className="text-[8px] text-slate-400 mt-2 uppercase tracking-widest font-medium">MAX 5MB, JPG/PNG ONLY</p>
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</label>

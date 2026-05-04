@@ -409,3 +409,15 @@ export const fetchAllOrders = async (token) => {
   if (!res.ok) throw new Error('Failed to fetch all orders');
   return res.json();
 };
+
+export const uploadImage = async (token, formData) => {
+  const res = await fetch(`${API_URL}/upload`, {
+    method: 'POST',
+    headers: { 
+      'Authorization': `Bearer ${token}` 
+    },
+    body: formData,
+  });
+  if (!res.ok) throw new Error('Failed to upload image');
+  return res.json();
+};

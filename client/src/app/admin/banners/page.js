@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Image as ImageIcon, Trash2, Edit2, Link as LinkIcon, Check, X, Loader2 } from "lucide-react";
-import { fetchBanners, createBanner, updateBanner, deleteBanner } from "@/lib/api";
+import { fetchBanners, createBanner, updateBanner, deleteBanner, uploadImage } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function BannersPage() {
@@ -19,6 +19,8 @@ export default function BannersPage() {
     active: true
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   useEffect(() => {
     loadBanners();
@@ -44,21 +46,51 @@ export default function BannersPage() {
 
     try {
       setIsSaving(true);
+
+      let imageUrl = formData.image;
+      if (imageFile) {
+        const formDataUpload = new FormData();
+        formDataUpload.append("image", imageFile);
+        const uploadRes = await uploadImage(token, formDataUpload);
+        imageUrl = uploadRes.url;
+      }
+
+      const bannerData = {
+        ...formData,
+        image: imageUrl
+      };
+
       if (editingBanner) {
-        const data = await updateBanner(token, editingBanner._id, formData);
+        const data = await updateBanner(token, editingBanner._id, bannerData);
         setBanners(banners.map(b => b._id === editingBanner._id ? data.banner : b));
       } else {
-        const data = await createBanner(token, formData);
+        const data = await createBanner(token, bannerData);
         setBanners([...banners, data.banner]);
       }
       setIsAddingBanner(false);
       setEditingBanner(null);
       setFormData({ title: "", image: "", link: "", active: true });
+      setImageFile(null);
+      setImagePreview("");
     } catch (err) {
       console.error("Error saving banner:", err);
       alert(err.message || "Failed to save banner");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -164,6 +196,8 @@ export default function BannersPage() {
                         setEditingBanner(banner);
                         setFormData({ title: banner.title, image: banner.image, link: banner.link, active: banner.active });
                         setIsAddingBanner(true);
+                        setImagePreview(banner.image || "");
+                        setImageFile(null);
                       }}
                       className="p-2 text-slate-400 hover:text-brand transition-colors bg-white border border-slate-200 rounded-sm hover:border-brand"
                     >
@@ -186,12 +220,19 @@ export default function BannersPage() {
 
       {isAddingBanner && (
         <div className="fixed inset-0 bg-brand-blue/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-sm shadow-2xl overflow-hidden animate-reveal">
+          <div className="bg-white w-full max-lg rounded-sm shadow-2xl overflow-hidden animate-reveal">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">
                 {editingBanner ? "Edit Banner" : "Add New Banner"}
               </h2>
-              <button onClick={() => setIsAddingBanner(false)} className="text-slate-400 hover:text-brand">
+              <button 
+                onClick={() => {
+                  setIsAddingBanner(false);
+                  setImageFile(null);
+                  setImagePreview("");
+                }} 
+                className="text-slate-400 hover:text-brand"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -206,15 +247,33 @@ export default function BannersPage() {
                   placeholder="e.g. Summer Sale" 
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Image URL</label>
-                <input 
-                  type="text" 
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand transition-all text-sm font-medium" 
-                  placeholder="https://..." 
-                />
+              
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Banner Image</label>
+                <div className="flex items-center gap-6">
+                  <div className="w-32 h-16 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
+                    {imagePreview || formData.image ? (
+                      <img src={imagePreview || formData.image} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon className="text-slate-200" size={24} />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden" 
+                      id="banner-image"
+                    />
+                    <label 
+                      htmlFor="banner-image"
+                      className="inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-sm text-[10px] font-black uppercase tracking-widest cursor-pointer transition-colors"
+                    >
+                      {imageFile ? "Change Image" : "Upload Image"}
+                    </label>
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Redirect Link</label>

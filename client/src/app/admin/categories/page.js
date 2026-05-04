@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchCategories, createCategory, updateCategory, deleteCategory } from "@/lib/api";
+import { fetchCategories, createCategory, updateCategory, deleteCategory, uploadImage } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Plus, 
@@ -10,7 +10,9 @@ import {
   Trash2, 
   X,
   Loader2,
-  Layers
+  Layers,
+  ImageIcon,
+  Image as ImageIconLucide
 } from "lucide-react";
 
 export default function AdminCategoriesPage() {
@@ -24,9 +26,12 @@ export default function AdminCategoriesPage() {
   const [newCategory, setNewCategory] = useState({
     name: "",
     slug: "",
-    description: ""
+    description: "",
+    image: ""
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   const loadCategories = async (isMounted = true) => {
     try {
@@ -54,21 +59,51 @@ export default function AdminCategoriesPage() {
     
     try {
       setIsSaving(true);
+
+      let imageUrl = newCategory.image;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        const uploadRes = await uploadImage(token, formData);
+        imageUrl = uploadRes.url;
+      }
+
+      const categoryData = {
+        ...newCategory,
+        image: imageUrl
+      };
+
       if (editingCategory) {
-        const data = await updateCategory(token, editingCategory.slug, newCategory);
+        const data = await updateCategory(token, editingCategory.slug, categoryData);
         setCategories(categories.map(c => c.slug === editingCategory.slug ? data.category : c));
       } else {
-        const data = await createCategory(token, newCategory);
+        const data = await createCategory(token, categoryData);
         setCategories([...categories, data.category]);
       }
       setIsAddingCategory(false);
       setEditingCategory(null);
-      setNewCategory({ name: "", slug: "", description: "" });
+      setNewCategory({ name: "", slug: "", description: "", image: "" });
+      setImageFile(null);
+      setImagePreview("");
     } catch (err) {
       console.error("Error saving category:", err);
       alert(err.message || "Failed to save category");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -134,9 +169,12 @@ export default function AdminCategoriesPage() {
                       setNewCategory({
                         name: category.name,
                         slug: category.slug,
-                        description: category.description || ""
+                        description: category.description || "",
+                        image: category.image || ""
                       });
                       setIsAddingCategory(true);
+                      setImagePreview(category.image || "");
+                      setImageFile(null);
                     }}
                     className="p-2 text-slate-300 hover:text-brand transition-colors"
                   >
@@ -175,6 +213,8 @@ export default function AdminCategoriesPage() {
                 onClick={() => {
                   setIsAddingCategory(false);
                   setEditingCategory(null);
+                  setImageFile(null);
+                  setImagePreview("");
                 }} 
                 className="text-slate-400 hover:text-brand"
               >
@@ -202,6 +242,34 @@ export default function AdminCategoriesPage() {
                   placeholder="e.g. kitchen-chimneys" 
                 />
               </div>
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Category Image</label>
+                <div className="flex items-center gap-6">
+                  <div className="w-20 h-20 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
+                    {imagePreview || newCategory.image ? (
+                      <img src={imagePreview || newCategory.image} alt="Preview" className="w-full h-full object-contain" />
+                    ) : (
+                      <ImageIconLucide className="text-slate-200" size={24} />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden" 
+                      id="category-image"
+                    />
+                    <label 
+                      htmlFor="category-image"
+                      className="inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-sm text-[10px] font-black uppercase tracking-widest cursor-pointer transition-colors"
+                    >
+                      {imageFile ? "Change Image" : "Upload Image"}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</label>
                 <textarea 

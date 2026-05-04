@@ -2,6 +2,9 @@
 
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import ProductCard from "@/components/ui/ProductCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Heart, ShoppingBag, Trash2, ArrowRight, Ghost } from "lucide-react";
@@ -11,6 +14,22 @@ import Image from "next/image";
 export default function WishlistPage() {
   const { wishlistItems, toggleWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/auth/login?redirect=/wishlist");
+    }
+  }, [loading, isAuthenticated, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand"></div>
+      </div>
+    );
+  }
 
   if (wishlistItems.length === 0) {
     return (

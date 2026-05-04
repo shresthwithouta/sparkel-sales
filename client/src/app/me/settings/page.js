@@ -35,7 +35,11 @@ export default function UserSettings() {
 
 function SettingsForm({ user }) {
   const { token, login } = useAuth()
-  const [formData, setFormData] = useState({ name: user.name || '', email: user.email || '' })
+  const [formData, setFormData] = useState({ 
+    name: user.name || '', 
+    email: user.email || '',
+    phone: user.phone || ''
+  })
   const [message, setMessage] = useState({ type: '', text: '' })
   const [isSaving, setIsSaving] = useState(false)
 
@@ -48,7 +52,8 @@ function SettingsForm({ user }) {
     street: user.address?.street || '', 
     city: user.address?.city || '', 
     state: user.address?.state || '', 
-    zipCode: user.address?.zipCode || '' 
+    zipCode: user.address?.zipCode || '',
+    country: user.address?.country || ''
   })
 
   const handleAddressChange = (e) => {
@@ -132,6 +137,18 @@ function SettingsForm({ user }) {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleProfileChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={isSaving}
@@ -192,6 +209,18 @@ function SettingsForm({ user }) {
                 onChange={handleAddressChange}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
                 placeholder="700001"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Country</label>
+              <input
+                type="text"
+                name="country"
+                value={addressData.country}
+                onChange={handleAddressChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                placeholder="India"
               />
             </div>
 

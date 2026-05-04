@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
-import { fetchUserMe } from '@/lib/api'
+import { fetchUserMe, loginWithGoogle } from '@/lib/api'
 
 const AuthContext = createContext(null)
 
@@ -46,6 +46,17 @@ export function AuthProvider({ children }) {
     login(token, userData);
   };
 
+  const googleLogin = async (idToken) => {
+    setLoading(true);
+    try {
+      const data = await loginWithGoogle(idToken);
+      login(data.token, data.user);
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -53,6 +64,7 @@ export function AuthProvider({ children }) {
       loading, 
       login, 
       register,
+      googleLogin,
       logout,
       isAuthenticated: !!user,
       isAdmin: user?.role === 'admin'
