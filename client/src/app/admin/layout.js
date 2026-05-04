@@ -12,7 +12,8 @@ import {
   Settings, 
   LogOut,
   ChevronRight,
-  Globe
+  Globe,
+  Users
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminGuard from "@/components/AdminGuard";
