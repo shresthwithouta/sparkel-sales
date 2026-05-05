@@ -81,6 +81,11 @@ export default function AdminProductsPage() {
       alert("Name, Slug, and Category are required");
       return;
     }
+    
+    if (!/^[a-z0-9-]+$/.test(newProduct.slug)) {
+      alert("Slug must contain only lowercase letters, numbers, and hyphens (e.g., flora-90-chimney)");
+      return;
+    }
 
     try {
       setIsSaving(true);

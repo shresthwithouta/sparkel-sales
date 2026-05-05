@@ -11,7 +11,7 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-brand-blue mb-3">1. General Terms</h2>
             <p className="text-slate-700 leading-relaxed">
-              By accessing and using this website (sparkel.in), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+              By accessing and using this website (sparkinnovations.com), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
             </p>
           </section>
 
@@ -31,7 +31,7 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-brand-blue mb-3">3. Product Information</h2>
             <p className="text-slate-700 leading-relaxed">
-              All product information, descriptions, prices, and images are provided as-is. We strive to maintain accurate information but do not guarantee the accuracy of all content. Sparkel reserves the right to make corrections or changes at any time.
+              All product information, descriptions, prices, and images are provided as-is. We strive to maintain accurate information but do not guarantee the accuracy of all content. Spark Innovations reserves the right to make corrections or changes at any time.
             </p>
           </section>
 
@@ -52,7 +52,7 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-brand-blue mb-3">6. Limitation of Liability</h2>
             <p className="text-slate-700 leading-relaxed">
-              In no event shall Sparkel be liable for any special, indirect, incidental, or consequential damages whatsoever, including but not limited to damages for loss of profits, data, or other intangible losses.
+              In no event shall Spark Innovations be liable for any special, indirect, incidental, or consequential damages whatsoever, including but not limited to damages for loss of profits, data, or other intangible losses.
             </p>
           </section>
 
@@ -66,7 +66,7 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-brand-blue mb-3">8. Contact Information</h2>
             <p className="text-slate-700 leading-relaxed">
-              If you have any questions about these Terms and Conditions, please contact us at support@sparkel.in or call our customer support team.
+              If you have any questions about these Terms and Conditions, please contact us at support@sparkinnovations.com or call our customer support team.
             </p>
           </section>
         </div>

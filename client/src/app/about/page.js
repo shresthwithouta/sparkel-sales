@@ -34,14 +34,14 @@ export default function AboutPage() {
         <SectionHeader 
           badge="About Us"
           title={<>YOUR TRUSTED <span className="text-brand">KUTCHINA PARTNER.</span></>}
-          description="Sparkel Sales is a leading distributor of premium kitchen appliances, bringing innovation and style to Indian homes."
+          description="Spark Innovations is a leading distributor of premium kitchen appliances, bringing innovation and style to Indian homes."
         />
 
         {}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-32">
           <div className="relative aspect-[4/3] bg-slate-100 rounded-sm overflow-hidden border border-slate-200">
              <div className="absolute inset-0 flex items-center justify-center bg-brand-blue/5">
-                <span className="text-brand-blue/10 text-9xl font-black">SPARKEL</span>
+                <span className="text-brand-blue/10 text-9xl font-black">SPARK</span>
              </div>
              <Image 
                 src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070&auto=format&fit=crop"
@@ -55,7 +55,7 @@ export default function AboutPage() {
               ESTABLISHING EXCELLENCE <br />IN KITCHEN SOLUTIONS.
             </h2>
             <p className="text-slate-600 leading-relaxed font-medium text-lg">
-              Sparkel Sales was founded with a mission to simplify kitchen management for Indian households. We believe that a kitchen is the heart of a home, and it deserves the best technology.
+              Spark Innovations was founded with a mission to simplify kitchen management for Indian households. We believe that a kitchen is the heart of a home, and it deserves the best technology.
             </p>
             <p className="text-slate-600 leading-relaxed font-medium">
               Over the years, we have grown into a trusted name for Kutchina products, serving thousands of satisfied customers across the region. Our commitment to quality and service has made us the preferred choice for homeowners and interior designers alike.

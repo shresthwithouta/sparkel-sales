@@ -12,8 +12,8 @@ export default function FAQ() {
       icon: <MessageCircle size={24} />,
       items: [
         {
-          q: 'What does Sparkel sell?',
-          a: 'Sparkel is an authorized distributor of Kutchina kitchen appliances including chimneys, hobs, cooktops, and water purifiers. We offer authentic products with full warranty support.'
+          q: 'What does Spark Innovations sell?',
+          a: 'Spark Innovations is an authorized distributor of Kutchina kitchen appliances including chimneys, hobs, cooktops, and water purifiers. We offer authentic products with full warranty support.'
         },
         {
           q: 'Where are you located?',
@@ -166,7 +166,7 @@ export default function FAQ() {
             <a href="https://wa.me/919876543210" className="px-6 py-3 bg-white/20 text-white rounded-lg font-bold border-2 border-white hover:bg-white/30 transition inline-block">
               WhatsApp
             </a>
-            <a href="mailto:support@sparkel.in" className="px-6 py-3 bg-white/20 text-white rounded-lg font-bold border-2 border-white hover:bg-white/30 transition inline-block">
+            <a href="mailto:support@sparkinnovations.in" className="px-6 py-3 bg-white/20 text-white rounded-lg font-bold border-2 border-white hover:bg-white/30 transition inline-block">
               Email Us
             </a>
           </div>

@@ -14,19 +14,36 @@ export default function ProductCard({ product }) {
     addToCart(product);
   };
 
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      window.location.href = "/auth/login";
+      return;
+    }
+    toggleWishlist(product);
+  };
+
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="group flex flex-col h-full bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all"
-    >
-      <div className="relative aspect-square w-full bg-slate-50 p-6 flex items-center justify-center">
-        <Image
-          src={product.images?.[0] || "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070&auto=format&fit=crop"}
-          alt={product.name}
-          fill
-          className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+    <div className="group relative bg-white border border-slate-200 rounded-sm overflow-hidden hover:shadow-xl transition-all duration-500">
+      <Link href={`/products/${product.slug}`} className="block aspect-square relative p-6 md:p-8 bg-slate-50 group-hover:bg-white transition-colors duration-500">
+        <Image 
+          src={product.images?.[0] || product.image || "/images/placeholder-product.svg"} 
+          alt={product.name} 
+          fill 
+          className="object-contain group-hover:scale-110 transition-transform duration-700" 
         />
-      </div>
+        <button 
+          onClick={handleWishlistClick}
+          className={`absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 z-10 ${
+            isInWishlist(product.slug) 
+              ? "bg-brand text-white shadow-lg shadow-brand/20 scale-110" 
+              : "bg-white/80 text-slate-400 hover:text-brand hover:bg-white shadow-sm"
+          }`}
+        >
+          <Heart size={16} fill={isInWishlist(product.slug) ? "currentColor" : "none"} strokeWidth={2.5} />
+        </button>
+      </Link>
 
       <div className="p-6 flex flex-col flex-1 gap-4">
         <div className="space-y-1">

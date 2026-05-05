@@ -57,6 +57,11 @@ export default function AdminCategoriesPage() {
       return;
     }
     
+    if (!/^[a-z0-9-]+$/.test(newCategory.slug)) {
+      alert("Slug must contain only lowercase letters, numbers, and hyphens (e.g., kitchen-chimneys)");
+      return;
+    }
+    
     try {
       setIsSaving(true);
 

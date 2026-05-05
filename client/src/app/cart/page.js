@@ -22,11 +22,14 @@ export default function CartPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
+  // Remove force login to allow guest cart viewing
+  /*
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push("/auth/login?redirect=/cart");
     }
   }, [loading, isAuthenticated, router]);
+  */
 
   if (loading) {
     return (
@@ -81,15 +84,13 @@ export default function CartPage() {
                   <div key={item.slug} className="p-6 grid grid-cols-1 md:grid-cols-5 gap-6 items-center group">
                     <div className="md:col-span-2 flex items-center gap-6">
                       <div className="w-20 h-20 bg-white border border-slate-200 rounded-sm relative overflow-hidden p-2 shrink-0 group-hover:border-brand transition-colors">
-                        <Image src={item.images[0]} alt={item.name} fill className="object-contain" />
+                        <Image src={item.images?.[0] || item.image || "/images/placeholder-product.svg"} alt={item.name} fill className="object-contain" />
                       </div>
                       <div>
                         <Link href={`/products/${item.slug}`} className="text-base font-black text-brand-blue uppercase tracking-tight hover:text-brand transition-colors line-clamp-1">
                           {item.name}
                         </Link>
-                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">
-                          {item.category.replace("-", " ")}
-                        </p>
+                          {item.category?.replace("-", " ") || "General"}
                         <button 
                           onClick={() => removeFromCart(item.slug)}
                           className="mt-4 flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors"

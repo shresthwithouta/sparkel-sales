@@ -41,11 +41,14 @@ export default function CheckoutPage() {
     country: user?.address?.country || "India"
   });
 
+  // Remove force login for guest checkout support
+  /*
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/auth/login?redirect=/checkout");
     }
   }, [authLoading, isAuthenticated, router]);
+  */
 
   useEffect(() => {
     if (user) {
@@ -78,17 +81,20 @@ export default function CheckoutPage() {
     } else if (step === 2) {
       try {
         setIsProcessing(true);
-        await createOrder(token, {
+        const orderData = {
           items: cartItems.map(item => ({
             slug: item.slug,
             name: item.name,
             price: item.price,
             quantity: item.quantity,
-            image: item.images[0]
+            image: item.images?.[0] || item.image
           })),
           shipping: formData,
           paymentMethod
-        });
+        };
+
+        // If authenticated, token is used. If guest, token is null and backend must handle it.
+        await createOrder(token, orderData);
         setStep(3);
       } catch (err) {
         alert(err.message || "Failed to place order. Please try again.");
@@ -117,7 +123,7 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-4xl font-black text-brand-blue uppercase tracking-tight mb-4">Order Placed Successfully!</h1>
         <p className="text-slate-500 max-w-md mx-auto mb-10 leading-relaxed">
-          Thank you for choosing Sparkel Sales. Our team will contact you shortly to confirm the delivery and installation details.
+          Thank you for choosing Spark Innovations. Our team will contact you shortly to confirm the delivery and installation details.
         </p>
         <Link 
           href="/" 
@@ -153,8 +159,9 @@ export default function CheckoutPage() {
               
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                  <label htmlFor="checkout-name" className="text-[9px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
                   <input 
+                    id="checkout-name"
                     type="text" 
                     name="name"
                     value={formData.name}
@@ -164,8 +171,9 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Phone Number</label>
+                  <label htmlFor="checkout-phone" className="text-[9px] font-black uppercase tracking-widest text-slate-400">Phone Number</label>
                   <input 
+                    id="checkout-phone"
                     type="tel" 
                     name="phone"
                     value={formData.phone}
@@ -176,8 +184,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Detailed Address</label>
+                <label htmlFor="checkout-address" className="text-[9px] font-black uppercase tracking-widest text-slate-400">Detailed Address</label>
                 <textarea 
+                  id="checkout-address"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
@@ -296,7 +305,7 @@ export default function CheckoutPage() {
               {cartItems.map((item) => (
                 <div key={item.slug} className="flex gap-4">
                   <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden shrink-0">
-                    <Image src={item.images[0]} alt={item.name} fill className="object-contain" />
+                    <Image src={item.images?.[0] || item.image} alt={item.name} fill className="object-contain" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] font-black text-brand-blue uppercase leading-tight mb-1 line-clamp-1">{item.name}</p>

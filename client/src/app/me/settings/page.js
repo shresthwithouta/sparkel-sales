@@ -170,8 +170,9 @@ function SettingsForm({ user }) {
           <h2 className="text-xl font-bold text-brand-blue mb-6">Update Profile</h2>
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+              <label htmlFor="settings-name" className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
               <input
+                id="settings-name"
                 type="text"
                 name="name"
                 value={formData.name}
@@ -182,8 +183,9 @@ function SettingsForm({ user }) {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+              <label htmlFor="settings-email" className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
               <input
+                id="settings-email"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -194,8 +196,9 @@ function SettingsForm({ user }) {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+              <label htmlFor="settings-phone" className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
               <input
+                id="settings-phone"
                 type="tel"
                 name="phone"
                 value={formData.phone}
@@ -220,8 +223,9 @@ function SettingsForm({ user }) {
           <h2 className="text-xl font-bold text-brand-blue mb-6">Delivery Address</h2>
           <form className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Street Address</label>
+              <label htmlFor="settings-street" className="block text-sm font-semibold text-slate-700 mb-2">Street Address</label>
               <input
+                id="settings-street"
                 type="text"
                 name="street"
                 value={addressData.street}

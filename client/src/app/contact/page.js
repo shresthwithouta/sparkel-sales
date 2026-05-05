@@ -13,11 +13,23 @@ export default function ContactPage() {
     message: ""
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const [status, setStatus] = useState({ loading: false, success: false, error: null });
 
-    alert("Thank you for your inquiry! We will get back to you soon.");
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ loading: true, success: false, error: null });
+
+    try {
+      // Simulate API call or actually call createInquiry if we want
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setStatus({ loading: false, success: true, error: null });
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setStatus(prev => ({ ...prev, success: false })), 5000);
+    } catch (err) {
+      setStatus({ loading: false, success: false, error: err.message || "Something went wrong" });
+    }
   };
 
   const contactInfo = [
@@ -30,7 +42,7 @@ export default function ContactPage() {
     {
       icon: <Mail size={20} />,
       title: "Email",
-      details: "sparkelsales@gmail.com",
+      details: "sparkinnovations@gmail.com",
       subtext: "24/7 Support available"
     },
     {
@@ -85,6 +97,16 @@ export default function ContactPage() {
           {}
           <div className="lg:col-span-3 bg-white border border-slate-200 rounded-sm p-8 md:p-12 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {status.success && (
+                <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 p-4 rounded-sm text-xs font-bold animate-reveal">
+                  Thank you for your inquiry! We will get back to you soon.
+                </div>
+              )}
+              {status.error && (
+                <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-sm text-xs font-bold animate-reveal">
+                  {status.error}
+                </div>
+              )}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
@@ -152,10 +174,17 @@ export default function ContactPage() {
 
               <button 
                 type="submit"
-                className="w-full bg-brand-blue text-white py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-brand transition-all group"
+                disabled={status.loading}
+                className="w-full bg-brand-blue text-white py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-brand transition-all group disabled:opacity-50"
               >
-                Send Message
-                <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {status.loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    Send Message
+                    <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </>
+                )}
               </button>
             </form>
           </div>

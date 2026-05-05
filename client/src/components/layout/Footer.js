@@ -32,7 +32,7 @@ export default function Footer() {
                 <span className="text-white font-black text-xl">S</span>
               </div>
               <span className="text-2xl font-black uppercase tracking-tighter">
-                Sparkel<span className="text-brand">Sales</span>
+                Spark <span className="text-brand">Innovations</span>
               </span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-10">
@@ -67,7 +67,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-brand mb-10">Authorized Partner</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Sparkel Sales is a certified premium distributor of Kutchina appliances. 
+              Spark Innovations is a certified premium distributor of Kutchina appliances. 
               Bringing world-class kitchen technology to your doorstep with expert support.
             </p>
           </div>

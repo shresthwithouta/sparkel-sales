@@ -1,78 +1,129 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import { fetchCart, addToCartApi, removeFromCartApi, updateCartItemApi, clearCartApi } from "@/lib/api";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const { user, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  // Use a user-specific key for local storage
-  const cartKey = user?._id ? `cart_${user._id}` : "cart_guest";
+  // Guest key
+  const guestCartKey = "cart_guest";
 
-  // Load cart when user changes or component mounts
+  const syncCart = useCallback(async () => {
+    if (isAuthenticated && token) {
+      try {
+        setIsSyncing(true);
+        const data = await fetchCart(token);
+        if (data && data.items) {
+          setCartItems(data.items);
+        }
+      } catch (err) {
+        console.error("Failed to sync cart:", err);
+      } finally {
+        setIsSyncing(false);
+        setIsLoaded(true);
+      }
+    } else {
+      const saved = localStorage.getItem(guestCartKey);
+      setCartItems(saved ? JSON.parse(saved) : []);
+      setIsLoaded(true);
+    }
+  }, [token, isAuthenticated]);
+
   useEffect(() => {
-    const savedCart = localStorage.getItem(cartKey);
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    syncCart();
+  }, [syncCart]);
+
+  // Sync guest cart to local storage
+  useEffect(() => {
+    if (isLoaded && !isAuthenticated) {
+      localStorage.setItem(guestCartKey, JSON.stringify(cartItems));
+    }
+  }, [cartItems, isLoaded, isAuthenticated]);
+
+  const addToCart = async (product) => {
+    const existingItem = cartItems.find((item) => item.slug === product.slug);
+    
+    if (isAuthenticated && token) {
+      try {
+        setCartItems(prev => {
+          if (existingItem) {
+            return prev.map(i => i.slug === product.slug ? { ...i, quantity: i.quantity + 1 } : i);
+          }
+          return [...prev, { ...product, quantity: 1 }];
+        });
+        await addToCartApi(token, {
+          slug: product.slug,
+          name: product.name,
+          price: product.price,
+          image: product.images?.[0] || product.image,
+          quantity: 1
+        });
+      } catch (err) {
+        console.error("Add to cart failed:", err);
+        syncCart();
+      }
+    } else {
+      setCartItems(prev => {
+        if (existingItem) {
+          return prev.map(i => i.slug === product.slug ? { ...i, quantity: i.quantity + 1 } : i);
+        }
+        return [...prev, { ...product, quantity: 1 }];
+      });
+    }
+  };
+
+  const removeFromCart = async (slug) => {
+    if (isAuthenticated && token) {
+      try {
+        setCartItems(prev => prev.filter(i => i.slug !== slug));
+        await removeFromCartApi(token, slug);
+      } catch (err) {
+        console.error("Remove from cart failed:", err);
+        syncCart();
+      }
+    } else {
+      setCartItems(prev => prev.filter(i => i.slug !== slug));
+    }
+  };
+
+  const updateQuantity = async (slug, quantity) => {
+    if (quantity < 1) return;
+    
+    if (isAuthenticated && token) {
+      try {
+        setCartItems(prev => prev.map(i => i.slug === slug ? { ...i, quantity } : i));
+        await updateCartItemApi(token, slug, quantity);
+      } catch (err) {
+        console.error("Update quantity failed:", err);
+        syncCart();
+      }
+    } else {
+      setCartItems(prev => prev.map(i => i.slug === slug ? { ...i, quantity } : i));
+    }
+  };
+
+  const clearCart = async () => {
+    if (isAuthenticated && token) {
+      try {
+        setCartItems([]);
+        await clearCartApi(token);
+      } catch (err) {
+        console.error("Clear cart failed:", err);
+        syncCart();
+      }
     } else {
       setCartItems([]);
     }
-    setIsLoaded(true);
-  }, [cartKey]);
-
-  // Save cart whenever it changes
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem(cartKey, JSON.stringify(cartItems));
-    }
-  }, [cartItems, cartKey, isLoaded]);
-
-  // When a guest logs in, merge their guest cart with their user cart
-  // Or just clear it? Usually merging is better, but user-specific cart is what's requested.
-  // Actually, the request "cart isnt different for each user" implies that 
-  // when User A logs out and User B logs in, they see User A's cart.
-  // My new logic fixes this by using cartKey tied to user._id.
-
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.slug === product.slug);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.slug === product.slug
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
   };
 
-  const removeFromCart = (slug) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.slug !== slug));
-  };
-
-  const updateQuantity = (slug, quantity) => {
-    if (quantity < 1) return;
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.slug === slug ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const clearCart = () => {
-    setCartItems([]);
-  };
-
-  const cartTotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-
+  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   return (
@@ -85,6 +136,8 @@ export function CartProvider({ children }) {
         clearCart,
         cartTotal,
         cartCount,
+        isLoaded,
+        isSyncing
       }}
     >
       {children}

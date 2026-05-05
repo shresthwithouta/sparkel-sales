@@ -31,7 +31,7 @@ export default function JobsPage() {
         <SectionHeader 
           badge="Careers"
           title={<>JOIN OUR <span className="text-brand">GROWING TEAM.</span></>}
-          description="Build your career with Sparkel Sales and help us redefine the modern Indian kitchen."
+          description="Build your career with Spark Innovations and help us redefine the modern Indian kitchen."
         />
 
         <div className="max-w-4xl mx-auto space-y-6">
@@ -69,7 +69,7 @@ export default function JobsPage() {
         <div className="mt-20 bg-slate-50 border border-slate-100 rounded-sm p-12 text-center max-w-4xl mx-auto">
           <h3 className="text-xl font-black text-brand-blue uppercase tracking-tight mb-4">Don&apos;t see a fitting role?</h3>
           <p className="text-slate-500 text-sm font-medium mb-8">
-            Send your resume to <span className="text-brand font-black">sparkelsales@gmail.com</span> and we&apos;ll keep you in mind for future openings.
+            Send your resume to <span className="text-brand font-black">sparkinnovations@gmail.com</span> and we&apos;ll keep you in mind for future openings.
           </p>
           <button className="text-[10px] font-black uppercase tracking-widest text-brand-blue hover:text-brand transition-colors">
             General Application →

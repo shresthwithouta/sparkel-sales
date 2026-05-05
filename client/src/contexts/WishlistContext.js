@@ -7,13 +7,10 @@ import { useAuth } from "./AuthContext";
 const WishlistContext = createContext(null);
 
 export function WishlistProvider({ children }) {
-  const { token, isAuthenticated, user } = useAuth();
+  const { token, isAuthenticated } = useAuth();
   const [wishlistItems, setWishlistItems] = useState([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // User-specific key for localStorage
-  const wishlistKey = user?._id ? `wishlist_${user._id}` : "wishlist_guest";
 
   useEffect(() => {
     const syncWishlist = async () => {
@@ -21,64 +18,46 @@ export function WishlistProvider({ children }) {
         try {
           setIsSyncing(true);
           const data = await fetchWishlist(token);
-          setWishlistItems(data.items || []);
+          if (data && data.items) {
+            setWishlistItems(data.items);
+          }
         } catch (err) {
           console.error("Failed to sync wishlist:", err);
         } finally {
           setIsSyncing(false);
+          setIsLoaded(true);
         }
       } else {
-        const saved = localStorage.getItem(wishlistKey);
-        if (saved) {
-          setWishlistItems(JSON.parse(saved));
-        } else {
-          setWishlistItems([]);
-        }
+        setWishlistItems([]);
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
     };
     syncWishlist();
   }, [token, isAuthenticated]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
-    }
-  }, [wishlistItems, wishlistKey, isLoaded]);
-
   const toggleWishlist = async (product) => {
-    const exists = wishlistItems.find((item) => item.slug === product.slug);
-    
-    // Update local state immediately for snappy UI
-    if (exists) {
-      setWishlistItems(prev => prev.filter(item => item.slug !== product.slug));
-    } else {
-      setWishlistItems(prev => [...prev, product]);
+    if (!isAuthenticated) {
+      // Logic handled in component to redirect, but we'll return early here
+      return;
     }
 
-    // Sync with backend if logged in
-    if (isAuthenticated && token) {
-      try {
-        if (exists) {
-          await removeFromWishlist(token, product.slug);
-        } else {
-          // Normalize for backend which expects 'image' string, not 'images' array
-          await addToWishlist(token, {
-            slug: product.slug,
-            name: product.name,
-            price: product.price,
-            image: product.images?.[0] || product.image
-          });
-        }
-      } catch (err) {
-        console.error("Failed to sync wishlist action:", err);
-        // Rollback on error
-        if (exists) {
-          setWishlistItems(prev => [...prev, product]);
-        } else {
-          setWishlistItems(prev => prev.filter(item => item.slug !== product.slug));
-        }
+    const exists = wishlistItems.some((item) => item.slug === product.slug);
+
+    try {
+      if (exists) {
+        // Optimistic update
+        setWishlistItems(prev => prev.filter(item => item.slug !== product.slug));
+        await removeFromWishlist(token, product.slug);
+      } else {
+        // Optimistic update
+        setWishlistItems(prev => [...prev, product]);
+        await addToWishlist(token, product);
       }
+    } catch (err) {
+      console.error("Wishlist update failed:", err);
+      // Rollback on error
+      const data = await fetchWishlist(token);
+      setWishlistItems(data.items || []);
     }
   };
 
@@ -86,8 +65,14 @@ export function WishlistProvider({ children }) {
     return wishlistItems.some((item) => item.slug === slug);
   };
 
-  const clearWishlist = () => {
-    setWishlistItems([]);
+  const clearWishlist = async () => {
+    if (!isAuthenticated || !token) return;
+    try {
+      setWishlistItems([]);
+      await clearWishlistApi(token);
+    } catch (err) {
+      console.error("Failed to clear wishlist:", err);
+    }
   };
 
   return (
@@ -98,6 +83,8 @@ export function WishlistProvider({ children }) {
         toggleWishlist,
         isInWishlist,
         clearWishlist,
+        isSyncing,
+        isLoaded
       }}
     >
       {children}

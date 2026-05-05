@@ -39,7 +39,7 @@ export default function AdminLayout({ children }) {
       {}
       <aside className="w-64 bg-brand-blue text-white fixed h-full flex flex-col">
         <div className="p-8">
-          <h2 className="text-xl font-black tracking-tighter uppercase">Sparkel <span className="text-brand">Admin</span></h2>
+          <h2 className="text-xl font-black tracking-tighter uppercase">Spark <span className="text-brand">Innovations Admin</span></h2>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-2">

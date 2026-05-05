@@ -23,20 +23,26 @@ export default function ProductDetailPage({ params }) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
 
+  const [settings, setSettings] = useState(null);
+  
   useEffect(() => {
-    const loadProduct = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const data = await fetchProductBySlug(slug);
-        setProduct(data.product);
+        const [productData, settingsData] = await Promise.all([
+          fetchProductBySlug(slug),
+          import("@/lib/api").then(m => m.fetchSiteSettings())
+        ]);
+        setProduct(productData.product);
+        setSettings(settingsData.settings);
       } catch (err) {
-        console.error("Error loading product:", err);
+        console.error("Error loading product data:", err);
         setError("Product not found");
       } finally {
         setLoading(false);
       }
     };
-    loadProduct();
+    loadData();
   }, [slug]);
 
   if (loading) {
@@ -167,7 +173,7 @@ export default function ProductDetailPage({ params }) {
                   Inquire Now
                 </button>
                 <a 
-                  href="tel:+919831012345"
+                  href={`tel:${settings?.phone || "+919831012345"}`}
                   className="flex-1 border-2 border-brand-blue text-brand-blue py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-brand-blue hover:text-white transition-all group"
                 >
                   <Phone size={18} />

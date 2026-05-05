@@ -45,8 +45,8 @@ export default function Navbar() {
               <span className="text-white font-bold text-lg">S</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-brand-blue uppercase tracking-tighter leading-none">
-                Sparkel<span className="text-brand">Sales</span>
+              <span className="text-2xl font-black uppercase tracking-tighter">
+                Spark <span className="text-brand">Innovations</span>
               </span>
             </div>
           </Link>
@@ -66,7 +66,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-8">
             {mounted && isAuthenticated && (
               <>
-                <Link href="/wishlist" className="relative text-brand-blue hover:text-brand transition-colors">
+                <Link href="/wishlist" className="relative text-brand-blue hover:text-brand transition-colors" aria-label={`View Wishlist (${wishlistCount} items)`}>
                   <Heart size={20} />
                   {wishlistCount > 0 && (
                     <span className="absolute -top-2 -right-2 w-5 h-5 bg-brand text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-white">
@@ -75,7 +75,7 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                <Link href="/cart" className="relative text-brand-blue hover:text-brand transition-colors">
+                <Link href="/cart" className="relative text-brand-blue hover:text-brand transition-colors" aria-label={`View Shopping Cart (${cartCount} items)`}>
                   <ShoppingBag size={20} />
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 w-5 h-5 bg-brand text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-white">
@@ -123,6 +123,7 @@ export default function Navbar() {
           <button
             className="lg:hidden p-2 text-brand-blue"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

@@ -13,11 +13,27 @@ export default function InquiryModal({ isOpen, onClose, product }) {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleEsc);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       setLoading(true);
       await createInquiry({
@@ -31,7 +47,7 @@ export default function InquiryModal({ isOpen, onClose, product }) {
         setFormData({ name: "", email: "", phone: "", message: "" });
       }, 3000);
     } catch (err) {
-      alert(err.message || "Failed to send inquiry");
+      setError(err.message || "Failed to send inquiry");
     } finally {
       setLoading(false);
     }
@@ -63,6 +79,11 @@ export default function InquiryModal({ isOpen, onClose, product }) {
             </div>
 
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              {error && (
+                <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-sm text-xs font-bold animate-reveal">
+                  {error}
+                </div>
+              )}
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">

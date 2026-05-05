@@ -29,6 +29,34 @@ export const metadata = {
   },
   description: SITE_CONFIG.description,
   keywords: ["Kutchina", "Kitchen Chimney", "Hob", "Cooktop", "Water Purifier", "Kolkata", "Distributor"],
+  authors: [{ name: "Spark Innovations" }],
+  openGraph: {
+    type: "website",
+    locale: "en_IE",
+    url: "https://sparkinnovations.com",
+    title: SITE_CONFIG.name,
+    description: SITE_CONFIG.description,
+    siteName: SITE_CONFIG.name,
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: SITE_CONFIG.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_CONFIG.name,
+    description: SITE_CONFIG.description,
+    images: ["/og-image.jpg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {

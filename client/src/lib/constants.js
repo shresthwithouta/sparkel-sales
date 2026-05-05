@@ -1,5 +1,5 @@
 export const SITE_CONFIG = {
-  name: "Sparkel Sales",
+  name: "Spark Innovations",
   tagline: "Authorized Kutchina Distributor",
   description:
     "Your trusted partner for premium Kutchina kitchen appliances. Explore chimneys, hobs, cooktops, and more.",

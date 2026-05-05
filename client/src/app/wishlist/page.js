@@ -79,22 +79,13 @@ export default function WishlistPage() {
           {wishlistItems.map((product) => (
             <div key={product.slug} className="group relative">
               <ProductCard product={product} />
-              <div className="mt-4 flex gap-2">
-                <button 
-                  onClick={() => addToCart(product)}
-                  className="flex-1 bg-brand-blue text-white py-3 rounded-sm text-[9px] font-black uppercase tracking-widest hover:bg-brand transition-all flex items-center justify-center gap-2"
-                >
-                  <ShoppingBag size={14} />
-                  Add to Cart
-                </button>
-                <button 
-                  onClick={() => toggleWishlist(product)}
-                  className="p-3 bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-sm"
-                  title="Remove from wishlist"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              <button 
+                onClick={() => toggleWishlist(product)}
+                className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm text-red-500 shadow-sm flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50"
+                title="Remove from wishlist"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
           ))}
         </div>

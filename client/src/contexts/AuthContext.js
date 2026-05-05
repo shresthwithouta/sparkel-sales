@@ -18,6 +18,18 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      console.warn("Unauthorized access detected, logging out...");
+      logout();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth/login?expired=true';
+      }
+    };
+    window.addEventListener('unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('unauthorized', handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     const loadUser = async () => {
       const storedToken = localStorage.getItem('authToken')
       if (storedToken) {

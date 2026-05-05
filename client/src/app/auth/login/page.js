@@ -65,8 +65,8 @@ function LoginForm() {
               <div className="w-8 h-8 bg-brand flex items-center justify-center rounded transition-transform group-hover:scale-110">
                 <span className="text-white font-bold text-sm">S</span>
               </div>
-              <span className="text-xl font-bold text-brand-blue uppercase tracking-tighter">
-                Sparkel<span className="text-brand">Sales</span>
+              <span className="text-3xl font-black text-brand-blue uppercase tracking-tighter">
+                Spark <span className="text-brand">Innovations</span>
               </span>
             </Link>
             <h2 className="text-2xl font-bold text-brand-blue tracking-tight">Welcome Back</h2>

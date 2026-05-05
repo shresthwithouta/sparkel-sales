@@ -1,12 +1,50 @@
 const API_URL = '/api';
 
+// Centralized request helper to handle 401s and common logic
+const apiRequest = async (endpoint, options = {}) => {
+  const { token, ...fetchOptions } = options;
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...fetchOptions.headers,
+  };
+
+  try {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      ...fetchOptions,
+      headers,
+    });
+
+    // Handle 401 Unauthorized globally
+    if (res.status === 401) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('unauthorized'));
+      }
+    }
+
+    if (!res.ok) {
+      let errorMessage = `Request failed with status ${res.status}`;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        // Not JSON
+      }
+      throw new Error(errorMessage);
+    }
+
+    return res.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const fetchProducts = async (params = {}) => {
   try {
     if (!params.limit) params.limit = 100;
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${API_URL}/products?${query}`);
-    if (!res.ok) return { products: [], total: 0 };
-    return res.json();
+    return await apiRequest(`/products?${query}`);
   } catch (error) {
     console.warn("Backend not reachable, using fallback data.");
     return { products: [], total: 0 };
@@ -17,9 +55,7 @@ export const searchProducts = async (params = {}) => {
   try {
     if (!params.limit) params.limit = 100;
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${API_URL}/products/search?${query}`);
-    if (!res.ok) return { products: [], total: 0 };
-    return res.json();
+    return await apiRequest(`/products/search?${query}`);
   } catch (error) {
     console.warn("Backend not reachable, using fallback data.");
     return { products: [], total: 0 };
@@ -28,418 +64,170 @@ export const searchProducts = async (params = {}) => {
 
 export const fetchProductBySlug = async (slug) => {
   try {
-    const res = await fetch(`${API_URL}/products/${slug}`);
-    if (!res.ok) return null;
-    return res.json();
+    return await apiRequest(`/products/${slug}`);
   } catch (error) {
     return null;
   }
 };
 
-export const createProduct = async (token, productData) => {
-  const res = await fetch(`${API_URL}/products`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(productData),
-  });
-  if (!res.ok) throw new Error('Failed to create product');
-  return res.json();
-};
+export const createProduct = (token, productData) => 
+  apiRequest('/products', { method: 'POST', token, body: JSON.stringify(productData) });
 
-export const updateProduct = async (token, slug, productData) => {
-  const res = await fetch(`${API_URL}/products/${slug}`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(productData),
-  });
-  if (!res.ok) throw new Error('Failed to update product');
-  return res.json();
-};
+export const updateProduct = (token, slug, productData) => 
+  apiRequest(`/products/${slug}`, { method: 'PUT', token, body: JSON.stringify(productData) });
 
-export const deleteProduct = async (token, slug) => {
-  const res = await fetch(`${API_URL}/products/${slug}`, {
-    method: 'DELETE',
-    headers: { 
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  if (!res.ok) throw new Error('Failed to delete product');
-  return res.json();
-};
+export const deleteProduct = (token, slug) => 
+  apiRequest(`/products/${slug}`, { method: 'DELETE', token });
 
 export const fetchCategories = async () => {
   try {
-    const res = await fetch(`${API_URL}/categories`);
-    if (!res.ok) return { categories: [] };
-    return res.json();
+    return await apiRequest('/categories');
   } catch (error) {
     return { categories: [] };
   }
 };
 
-export const createCategory = async (token, categoryData) => {
-  const res = await fetch(`${API_URL}/categories`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(categoryData),
-  });
-  if (!res.ok) throw new Error('Failed to create category');
-  return res.json();
-};
+export const createCategory = (token, categoryData) => 
+  apiRequest('/categories', { method: 'POST', token, body: JSON.stringify(categoryData) });
 
-export const updateCategory = async (token, slug, categoryData) => {
-  const res = await fetch(`${API_URL}/categories/${slug}`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(categoryData),
-  });
-  if (!res.ok) throw new Error('Failed to update category');
-  return res.json();
-};
+export const updateCategory = (token, slug, categoryData) => 
+  apiRequest(`/categories/${slug}`, { method: 'PUT', token, body: JSON.stringify(categoryData) });
 
-export const deleteCategory = async (token, slug) => {
-  const res = await fetch(`${API_URL}/categories/${slug}`, {
-    method: 'DELETE',
-    headers: { 
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  if (!res.ok) throw new Error('Failed to delete category');
-  return res.json();
-};
+export const deleteCategory = (token, slug) => 
+  apiRequest(`/categories/${slug}`, { method: 'DELETE', token });
 
 export const fetchInquiries = async (token) => {
   try {
-    const res = await fetch(`${API_URL}/inquiries`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) return { inquiries: [] };
-    return res.json();
+    return await apiRequest('/inquiries', { token });
   } catch (error) {
     return { inquiries: [] };
   }
 };
 
-export const deleteInquiry = async (token, id) => {
-  const res = await fetch(`${API_URL}/inquiries/${id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to delete inquiry');
-  return res.json();
-};
+export const deleteInquiry = (token, id) => 
+  apiRequest(`/inquiries/${id}`, { method: 'DELETE', token });
 
-export const loginUser = async (credentials) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-  
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error('Too many requests. Please try again later.');
-    }
-    let errorMessage = 'Login failed';
-    try {
-      const error = await res.json();
-      errorMessage = error.message || errorMessage;
-    } catch (e) {
-      errorMessage = `Server error (${res.status}). Please ensure the backend is running.`;
-    }
-    throw new Error(errorMessage);
-  }
-  return res.json();
-};
+export const loginUser = (credentials) => 
+  apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
 
-export const registerUser = async (userData) => {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error('Too many requests. Please try again later.');
-    }
-    let errorMessage = 'Registration failed';
-    try {
-      const error = await res.json();
-      errorMessage = error.message || errorMessage;
-    } catch (e) {
-      errorMessage = `Server error (${res.status}). Please ensure the backend is running.`;
-    }
-    throw new Error(errorMessage);
-  }
-  return res.json();
-};
+export const registerUser = (userData) => 
+  apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(userData) });
 
-export const fetchUserMe = async (token) => {
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch user');
-  return res.json();
-};
+export const fetchUserMe = (token) => 
+  apiRequest('/auth/me', { token });
 
-export const createInquiry = async (inquiryData) => {
-  const res = await fetch(`${API_URL}/inquiries`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(inquiryData),
-  });
-  if (!res.ok) throw new Error('Failed to create inquiry');
-  return res.json();
-};
+export const createInquiry = (inquiryData) => 
+  apiRequest('/inquiries', { method: 'POST', body: JSON.stringify(inquiryData) });
 
-export const updateInquiryStatus = async (token, id, status) => {
-  const res = await fetch(`${API_URL}/inquiries/${id}`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ status }),
-  });
-  if (!res.ok) throw new Error('Failed to update inquiry status');
-  return res.json();
-};
+export const updateInquiryStatus = (token, id, status) => 
+  apiRequest(`/inquiries/${id}`, { method: 'PUT', token, body: JSON.stringify({ status }) });
 
-export const updateUserProfile = async (token, profileData) => {
-  const res = await fetch(`${API_URL}/auth/me`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(profileData),
-  });
-  if (!res.ok) throw new Error('Failed to update profile');
-  return res.json();
-};
+export const updateUserProfile = (token, profileData) => 
+  apiRequest('/auth/me', { method: 'PUT', token, body: JSON.stringify(profileData) });
 
-export const createOrder = async (token, orderData) => {
-  const res = await fetch(`${API_URL}/orders`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(orderData),
-  });
-  if (!res.ok) throw new Error('Failed to create order');
-  return res.json();
-};
+export const createOrder = (token, orderData) => 
+  apiRequest('/orders', { method: 'POST', token, body: JSON.stringify(orderData) });
 
 export const fetchUserOrders = async (token) => {
-  const res = await fetch(`${API_URL}/orders/me`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) return { orders: [] };
-  return res.json();
+  try {
+    return await apiRequest('/orders/me', { token });
+  } catch (error) {
+    return { orders: [] };
+  }
 };
 
 export const fetchBanners = async () => {
   try {
-    const res = await fetch(`${API_URL}/settings/banners`);
-    if (!res.ok) return { banners: [] };
-    return res.json();
+    return await apiRequest('/settings/banners');
   } catch (error) {
     return { banners: [] };
   }
 };
 
-export const updateBanner = async (token, id, bannerData) => {
-  const res = await fetch(`${API_URL}/settings/banners/${id}`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(bannerData),
-  });
-  if (!res.ok) throw new Error('Failed to update banner');
-  return res.json();
-};
+export const updateBanner = (token, id, bannerData) => 
+  apiRequest(`/settings/banners/${id}`, { method: 'PUT', token, body: JSON.stringify(bannerData) });
 
-export const createBanner = async (token, bannerData) => {
-  const res = await fetch(`${API_URL}/settings/banners`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(bannerData),
-  });
-  if (!res.ok) throw new Error('Failed to create banner');
-  return res.json();
-};
+export const createBanner = (token, bannerData) => 
+  apiRequest('/settings/banners', { method: 'POST', token, body: JSON.stringify(bannerData) });
 
-export const deleteBanner = async (token, id) => {
-  const res = await fetch(`${API_URL}/settings/banners/${id}`, {
-    method: 'DELETE',
-    headers: { 
-      'Authorization': `Bearer ${token}` 
-    }
-  });
-  if (!res.ok) throw new Error('Failed to delete banner');
-  return res.json();
-};
+export const deleteBanner = (token, id) => 
+  apiRequest(`/settings/banners/${id}`, { method: 'DELETE', token });
 
 export const fetchSiteSettings = async () => {
   try {
-    const res = await fetch(`${API_URL}/settings/site`);
-    if (!res.ok) return { settings: null };
-    return res.json();
+    return await apiRequest('/settings/site');
   } catch (error) {
     return { settings: null };
   }
 };
 
-export const updateSiteSettings = async (token, settingsData) => {
-  const res = await fetch(`${API_URL}/settings/site`, {
-    method: 'PUT',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(settingsData),
-  });
-  if (!res.ok) throw new Error('Failed to update site settings');
-  return res.json();
-};
+export const updateSiteSettings = (token, settingsData) => 
+  apiRequest('/settings/site', { method: 'PUT', token, body: JSON.stringify(settingsData) });
 
-export const loginWithGoogle = async (idToken) => {
-  const res = await fetch(`${API_URL}/auth/google`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: idToken }),
-  });
-  
-  if (!res.ok) {
-    let errorMessage = 'Google login failed';
-    try {
-      const error = await res.json();
-      errorMessage = error.message || errorMessage;
-    } catch (e) {
-      errorMessage = `Server error (${res.status}).`;
-    }
-    throw new Error(errorMessage);
-  }
-  return res.json();
-};
+export const loginWithGoogle = (idToken) => 
+  apiRequest('/auth/google', { method: 'POST', body: JSON.stringify({ token: idToken }) });
 
-export const fetchStats = async (token) => {
-  const res = await fetch(`${API_URL}/admin/stats`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch stats');
-  return res.json();
-};
+export const fetchStats = (token) => 
+  apiRequest('/admin/stats', { token });
 
 export const fetchWishlist = async (token) => {
-  const res = await fetch(`${API_URL}/wishlist`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) return { items: [] };
-  return res.json();
+  try {
+    return await apiRequest('/wishlist', { token });
+  } catch (error) {
+    return { items: [] };
+  }
 };
 
-export const addToWishlist = async (token, product) => {
-  const res = await fetch(`${API_URL}/wishlist`, {
+export const addToWishlist = (token, product) => 
+  apiRequest('/wishlist', { method: 'POST', token, body: JSON.stringify(product) });
+
+export const removeFromWishlist = (token, slug) => 
+  apiRequest(`/wishlist/${slug}`, { method: 'DELETE', token });
+
+export const clearWishlistApi = (token) => 
+  apiRequest('/wishlist/clear', { method: 'DELETE', token });
+
+export const fetchCart = async (token) => {
+  try {
+    return await apiRequest('/cart', { token });
+  } catch (error) {
+    return { items: [] };
+  }
+};
+
+export const addToCartApi = (token, product) => 
+  apiRequest('/cart', { method: 'POST', token, body: JSON.stringify(product) });
+
+export const removeFromCartApi = (token, slug) => 
+  apiRequest(`/cart/${slug}`, { method: 'DELETE', token });
+
+export const updateCartItemApi = (token, slug, quantity) => 
+  apiRequest(`/cart/${slug}`, { method: 'PUT', token, body: JSON.stringify({ quantity }) });
+
+export const clearCartApi = (token) => 
+  apiRequest('/cart/clear', { method: 'DELETE', token });
+
+export const updateOrderStatus = (token, id, status) => 
+  apiRequest(`/admin/orders/${id}/status`, { method: 'PATCH', token, body: JSON.stringify({ status }) });
+
+export const fetchAllOrders = (token) => 
+  apiRequest('/admin/orders', { token });
+
+export const uploadImage = (token, formData) => 
+  fetch(`${API_URL}/upload`, {
     method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify(product),
-  });
-  if (!res.ok) throw new Error('Failed to add to wishlist');
-  return res.json();
-};
-
-export const removeFromWishlist = async (token, slug) => {
-  const res = await fetch(`${API_URL}/wishlist/${slug}`, {
-    method: 'DELETE',
     headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to remove from wishlist');
-  return res.json();
-};
-
-export const clearWishlistApi = async (token) => {
-  const res = await fetch(`${API_URL}/wishlist/clear`, {
-    method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to clear wishlist');
-  return res.json();
-};
-
-export const updateOrderStatus = async (token, id, status) => {
-  const res = await fetch(`${API_URL}/admin/orders/${id}/status`, {
-    method: 'PATCH',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify({ status }),
-  });
-  if (!res.ok) throw new Error('Failed to update order status');
-  return res.json();
-};
-
-export const fetchAllOrders = async (token) => {
-  const res = await fetch(`${API_URL}/admin/orders`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch all orders');
-  return res.json();
-};
-
-export const uploadImage = async (token, formData) => {
-  const res = await fetch(`${API_URL}/upload`, {
-    method: 'POST',
-    headers: { 
-      'Authorization': `Bearer ${token}` 
-    },
     body: formData,
+  }).then(res => {
+    if (res.status === 401) window.dispatchEvent(new CustomEvent('unauthorized'));
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
   });
-  if (!res.ok) throw new Error('Failed to upload image');
-  return res.json();
-};
 
-export const fetchUsers = async (token) => {
-  const res = await fetch(`${API_URL}/admin/users`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch users');
-  return res.json();
-};
+export const fetchUsers = (token) => 
+  apiRequest('/admin/users', { token });
 
-export const updateAdminUser = async (token, id, data) => {
-  const res = await fetch(`${API_URL}/admin/users/${id}`, {
-    method: 'PATCH',
-    headers: { 
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error('Failed to update user');
-  return res.json();
-};
+export const updateAdminUser = (token, id, data) => 
+  apiRequest(`/admin/users/${id}`, { method: 'PATCH', token, body: JSON.stringify(data) });
+
 

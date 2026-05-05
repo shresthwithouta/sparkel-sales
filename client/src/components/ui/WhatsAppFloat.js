@@ -23,7 +23,7 @@ export default function WhatsAppFloat() {
 
   const handleClick = () => {
     window.open(
-      `https://wa.me/918808409295?text=Hi! I'm interested in Kutchina products from Sparkel Sales.`,
+      `https://wa.me/918808409295?text=Hi! I'm interested in Kutchina products from Spark Innovations.`,
       "_blank"
     );
   };
