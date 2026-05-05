@@ -19,7 +19,7 @@ import { useWishlist } from '@/contexts/WishlistContext'
 import { fetchUserOrders } from '@/lib/api'
 
 export default function UserDashboard() {
-  const { user, loading, logout, isAuthenticated } = useAuth()
+  const { user, loading, logout, isAuthenticated, token } = useAuth()
   const { wishlistCount } = useWishlist()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
@@ -28,7 +28,7 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const loadOrders = async () => {
-      if (!isAuthenticated) return
+      if (!isAuthenticated || !token) return
       try {
         setFetchingOrders(true)
         const data = await fetchUserOrders(token)
@@ -43,7 +43,7 @@ export default function UserDashboard() {
     if (isAuthenticated) {
       loadOrders()
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, token])
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {

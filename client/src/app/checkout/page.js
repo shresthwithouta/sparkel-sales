@@ -139,11 +139,11 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen pt-24 pb-20">
       <div className="container-wide">
-        <div className="flex items-center gap-4 mb-12">
-          <Link href="/products" className="w-10 h-10 border border-slate-200 flex items-center justify-center rounded-full text-slate-400 hover:text-brand transition-colors">
-            <ArrowLeft size={18} />
+        <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-12">
+          <Link href="/products" className="w-8 h-8 md:w-10 md:h-10 border border-slate-200 flex items-center justify-center rounded-full text-slate-400 hover:text-brand transition-colors">
+            <ArrowLeft size={16} className="md:w-[18px] md:h-[18px]" />
           </Link>
-          <h1 className="text-2xl font-black text-brand-blue uppercase tracking-tight">Checkout</h1>
+          <h1 className="text-xl md:text-2xl font-black text-brand-blue uppercase tracking-tight">Checkout</h1>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-16 items-start">

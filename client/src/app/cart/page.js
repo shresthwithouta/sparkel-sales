@@ -81,49 +81,72 @@ export default function CartPage() {
 
               <div className="divide-y divide-slate-100">
                 {cartItems.map((item) => (
-                  <div key={item.slug} className="p-6 grid grid-cols-1 md:grid-cols-5 gap-6 items-center group">
-                    <div className="md:col-span-2 flex items-center gap-6">
-                      <div className="w-20 h-20 bg-white border border-slate-200 rounded-sm relative overflow-hidden p-2 shrink-0 group-hover:border-brand transition-colors">
+                  <div key={item.slug} className="p-4 md:p-6 flex flex-col md:grid md:grid-cols-5 gap-4 md:gap-6 items-center group">
+                    <div className="w-full md:col-span-2 flex items-center gap-4 md:gap-6">
+                      <div className="w-20 h-20 md:w-24 md:h-24 bg-white border border-slate-100 rounded-lg relative overflow-hidden p-2 shrink-0 group-hover:border-brand transition-colors shadow-sm">
                         <Image src={item.images?.[0] || item.image || "/images/placeholder-product.svg"} alt={item.name} fill className="object-contain" />
                       </div>
-                      <div>
-                        <Link href={`/products/${item.slug}`} className="text-base font-black text-brand-blue uppercase tracking-tight hover:text-brand transition-colors line-clamp-1">
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/products/${item.slug}`} className="text-xs md:text-lg font-black text-brand-blue uppercase tracking-tight hover:text-brand transition-colors line-clamp-1 block">
                           {item.name}
                         </Link>
+                        <p className="text-[8px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">
                           {item.category?.replace("-", " ") || "General"}
-                        <button 
-                          onClick={() => removeFromCart(item.slug)}
-                          className="mt-4 flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 size={12} /> Remove
-                        </button>
+                        </p>
+                        <div className="md:hidden mt-2 flex justify-between items-end">
+                          <div>
+                            <p className="text-[10px] font-black text-brand">₹{item.price.toLocaleString("en-IN")}</p>
+                          </div>
+                          <button 
+                            onClick={() => removeFromCart(item.slug)}
+                            className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors bg-red-50 px-2 py-1 rounded-sm"
+                          >
+                            <Trash2 size={10} /> Remove
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="text-center">
+                    <div className="hidden md:block text-center w-full">
                       <p className="text-sm font-bold text-slate-600">₹{item.price.toLocaleString("en-IN")}</p>
                     </div>
 
-                    <div className="flex justify-center">
-                      <div className="flex items-center border border-slate-200 rounded-sm bg-slate-50 overflow-hidden">
+                    <div className="flex items-center justify-between w-full md:justify-center md:w-auto mt-2 md:mt-0 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-sm border border-slate-100 md:border-0">
+                      <span className="md:hidden text-[9px] font-black uppercase tracking-widest text-slate-400">Quantity</span>
+                      <div className="flex items-center border border-slate-200 rounded-sm bg-white overflow-hidden shadow-sm">
                         <button 
                           onClick={() => updateQuantity(item.slug, item.quantity - 1)}
-                          className="p-3 hover:bg-white transition-colors text-slate-400 hover:text-brand"
+                          className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
                         >
-                          <Minus size={12} />
+                          <Minus size={10} className="md:w-3 md:h-3" />
                         </button>
-                        <span className="w-10 text-center text-xs font-black text-brand-blue">{item.quantity}</span>
+                        <span className="w-8 md:w-10 text-center text-[10px] md:text-xs font-black text-brand-blue">{item.quantity}</span>
                         <button 
                           onClick={() => updateQuantity(item.slug, item.quantity + 1)}
-                          className="p-3 hover:bg-white transition-colors text-slate-400 hover:text-brand"
+                          className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
                         >
-                          <Plus size={12} />
+                          <Plus size={10} className="md:w-3 md:h-3" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="text-right">
+                    <div className="hidden md:block text-right w-full">
                       <p className="text-sm font-black text-brand-blue">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                    </div>
+
+                    <div className="md:hidden w-full pt-3 border-t border-slate-100 flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Subtotal</span>
+                      <p className="text-xs font-black text-brand-blue">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                    </div>
+
+                    <div className="hidden md:block">
+                      <button 
+                        onClick={() => removeFromCart(item.slug)}
+                        className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                        title="Remove Item"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </div>
                 ))}
