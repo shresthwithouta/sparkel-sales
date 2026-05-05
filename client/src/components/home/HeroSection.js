@@ -12,8 +12,8 @@ const HERO_SLIDES = [
     subtitle: "Advanced RO+UV+UF Technology",
     description: "Experience the purest drinking water with 7-stage purification and mineral enrichment.",
     image: "/images/hero/purifier.png",
-    accent: "text-blue-500",
-    bg: "bg-blue-50/10"
+    accent: "text-brand",
+    bg: "bg-orange-50/10"
   },
   {
     id: 2,
@@ -30,8 +30,8 @@ const HERO_SLIDES = [
     subtitle: "The Heart of Your Kitchen",
     description: "Toughened glass surface with high-efficiency brass burners for the modern Indian chef.",
     image: "/images/hero/hob.png",
-    accent: "text-brand-blue",
-    bg: "bg-slate-50/10"
+    accent: "text-brand",
+    bg: "bg-orange-50/10"
   }
 ];
 
@@ -70,7 +70,7 @@ export default function HeroSection() {
               priority={idx === 0}
             />
             {}
-            <div className="absolute inset-0 bg-linear-to-r from-white via-white/40 to-transparent z-10" />
+            <div className="absolute inset-0 bg-linear-to-r from-white to-transparent z-10" />
             <div className="absolute inset-0 bg-linear-to-t from-white via-transparent to-transparent z-10" />
           </div>
         ))}
@@ -80,13 +80,13 @@ export default function HeroSection() {
       <div className="relative h-full container-wide flex items-center z-20">
         <div className="max-w-2xl space-y-6 md:space-y-8 animate-reveal">
           <div className="space-y-3 md:space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 backdrop-blur-sm border border-slate-100 rounded-sm">
-              <span className={`w-1.5 h-1.5 rounded-full ${HERO_SLIDES[currentSlide].accent === 'text-brand' ? 'bg-brand' : 'bg-brand-blue'}`} />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-slate-100 rounded-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand" />
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
                 {HERO_SLIDES[currentSlide].subtitle}
               </p>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black text-brand-blue leading-[1.05] tracking-tighter">
+            <h1 className="text-4xl md:text-7xl font-black text-slate-900 leading-[1.05] tracking-tighter">
               {HERO_SLIDES[currentSlide].title}
             </h1>
             <p className="text-slate-600 text-sm md:text-lg font-medium max-w-lg leading-relaxed">
@@ -97,7 +97,7 @@ export default function HeroSection() {
           <div className="flex items-center gap-4">
             <Link 
               href="/products" 
-              className="px-8 md:px-10 py-4 bg-brand text-white font-black uppercase tracking-widest text-[10px] rounded-sm hover:bg-brand-dark transition-all shadow-xl shadow-brand/20 flex items-center gap-2 group/btn"
+              className="px-8 md:px-10 py-4 bg-brand text-white font-black uppercase tracking-widest text-[10px] rounded-sm hover:bg-brand-dark transition-all flex items-center gap-2 group/btn"
             >
               Shop Collection
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -113,7 +113,7 @@ export default function HeroSection() {
             key={idx}
             onClick={() => setCurrentSlide(idx)}
             className={`h-1.5 transition-all duration-500 rounded-full ${
-              idx === currentSlide ? 'w-12 bg-brand' : 'w-4 bg-slate-300 hover:bg-slate-400'
+              idx === currentSlide ? 'w-12 bg-brand' : 'w-4 bg-slate-200 hover:bg-slate-300'
             }`}
           />
         ))}
@@ -123,13 +123,13 @@ export default function HeroSection() {
       <div className="absolute right-10 bottom-10 flex gap-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:flex">
         <button 
           onClick={prevSlide}
-          className="w-12 h-12 bg-white border border-slate-100 text-brand-blue flex items-center justify-center rounded-full hover:bg-brand hover:text-white transition-all shadow-lg"
+          className="w-12 h-12 bg-white border border-slate-100 text-slate-900 flex items-center justify-center rounded-full hover:bg-brand hover:text-white transition-all"
         >
           <ChevronLeft size={20} />
         </button>
         <button 
           onClick={nextSlide}
-          className="w-12 h-12 bg-white border border-slate-100 text-brand-blue flex items-center justify-center rounded-full hover:bg-brand hover:text-white transition-all shadow-lg"
+          className="w-12 h-12 bg-white border border-slate-100 text-slate-900 flex items-center justify-center rounded-full hover:bg-brand hover:text-white transition-all"
         >
           <ChevronRight size={20} />
         </button>

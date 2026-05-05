@@ -14,6 +14,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    overflow-x: hidden;
   }
 
   ::selection {
@@ -79,9 +80,9 @@
   }
 
   .animate-reveal {
-    animation: reveal 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    animation: reveal 1.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
 
   .animate-float {

@@ -51,7 +51,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-        isScrolled ? "py-3 shadow-md" : "py-6"
+        isScrolled ? "py-3" : "py-6"
       } border-b border-slate-100`}
     >
       <div className="container-wide">
@@ -241,7 +241,7 @@ export default function Navbar() {
       </div>
 
       <div 
-        className={`lg:hidden fixed inset-0 bg-white/95 backdrop-blur-2xl z-40 transition-all duration-500 ease-in-out ${
+        className={`lg:hidden fixed inset-0 bg-white z-40 transition-all duration-500 ease-in-out ${
           mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
         }`}
       >
@@ -294,7 +294,7 @@ export default function Navbar() {
       </div>
 
       {}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-3 z-50 flex items-center justify-between safe-area-pb shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 z-50 flex items-center justify-between safe-area-pb">
         <Link href="/" className={`flex flex-col items-center gap-1 ${pathname === '/' ? 'text-brand' : 'text-slate-400'}`}>
           <div className={`p-1.5 rounded-xl transition-all ${pathname === '/' ? 'bg-brand/10' : ''}`}>
             <User size={18} className="rotate-0" /> {}
