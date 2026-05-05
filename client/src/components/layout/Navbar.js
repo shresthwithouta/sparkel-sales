@@ -14,7 +14,7 @@ import { fetchCategories } from "@/lib/api";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { cartCount } = useCart();
+  const { cartCount, cartItems } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -129,14 +129,64 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                <Link href="/cart" className="relative text-brand-blue hover:text-brand transition-colors" aria-label={`View Shopping Cart (${cartCount} items)`}>
-                  <ShoppingBag size={18} />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand text-white text-[8px] font-bold flex items-center justify-center rounded-full">
-                      {cartCount}
-                    </span>
-                  )}
-                </Link>
+                <div className="relative group">
+                  <Link href="/cart" className="relative text-brand-blue hover:text-brand transition-colors block py-1" aria-label={`View Shopping Cart (${cartCount} items)`}>
+                    <ShoppingBag size={18} />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-2 w-4 h-4 bg-brand text-white text-[8px] font-bold flex items-center justify-center rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Link>
+                  
+                  {/* Cart Dropdown Hover Card */}
+                  <div className="absolute right-0 top-full pt-4 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50">
+                    <div className="w-80 bg-white border border-slate-100 shadow-2xl rounded-sm p-6">
+                      <h3 className="text-[10px] font-black text-brand-blue uppercase tracking-[0.2em] mb-4 pb-2 border-b border-slate-50">Shopping Cart</h3>
+                      
+                      {cartItems.length > 0 ? (
+                        <>
+                          <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar space-y-4 mb-6">
+                            {cartItems.map((item) => (
+                              <div key={item.slug} className="flex gap-4">
+                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden shrink-0">
+                                  <img src={item.images?.[0] || item.image} alt={item.name} className="w-full h-full object-contain" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-black text-brand-blue uppercase leading-tight truncate mb-1">{item.name}</p>
+                                  <div className="flex justify-between items-center">
+                                    <p className="text-[9px] text-slate-400 font-bold">QTY: {item.quantity}</p>
+                                    <p className="text-[10px] font-black text-brand">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <Link 
+                              href="/cart" 
+                              className="w-full block text-center py-3 border border-slate-200 text-brand-blue font-black uppercase tracking-widest text-[9px] hover:bg-slate-50 transition-colors"
+                            >
+                              View Cart
+                            </Link>
+                            <Link 
+                              href="/checkout" 
+                              className="w-full block text-center py-3 bg-brand-blue text-white font-black uppercase tracking-widest text-[9px] hover:bg-brand transition-colors"
+                            >
+                              Checkout
+                            </Link>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="py-8 text-center">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your cart is empty</p>
+                          <Link href="/products" className="text-[10px] font-black text-brand uppercase underline mt-2 block">Start Shopping</Link>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </>
             )}
 
