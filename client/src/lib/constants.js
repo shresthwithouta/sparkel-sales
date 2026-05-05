@@ -143,7 +143,7 @@ export const SAMPLE_PRODUCTS = [
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Products", href: "/products" },
+  { label: "Categories", href: "#", isDropdown: true },
   { label: "Jobs", href: "/jobs" },
   { label: "About Us", href: "/about" },
   { label: "Contact Us", href: "/contact" },

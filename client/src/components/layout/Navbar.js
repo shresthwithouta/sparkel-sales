@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 import { usePathname } from "next/navigation";
+import { fetchCategories } from "@/lib/api";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -18,6 +19,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   useEffect(() => {
@@ -25,6 +27,19 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        if (data && data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error("Error loading categories for navbar:", error);
+      }
+    };
+    
+    loadCategories();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -54,13 +69,50 @@ export default function Navbar() {
 
           <div className="hidden lg:flex items-center gap-10">
             {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href || "#"}
-                className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-brand transition-colors"
-              >
-                {link.label}
-              </Link>
+              <div key={link.label} className="relative group/nav">
+                {link.isDropdown ? (
+                  <>
+                    <button className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-brand transition-colors py-2 flex items-center gap-1">
+                      {link.label}
+                      <span className="w-1 h-1 bg-brand rounded-full opacity-0 group-hover/nav:opacity-100 transition-opacity" />
+                    </button>
+                    
+                    {}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-4 opacity-0 invisible translate-y-4 group-hover/nav:opacity-100 group-hover/nav:visible group-hover/nav:translate-y-0 transition-all duration-300 z-50">
+                      <div className="bg-white border border-slate-100 shadow-2xl rounded-sm p-6 min-w-[240px]">
+                        <div className="grid gap-4">
+                          {categories.length > 0 ? (
+                            categories.map((cat) => (
+                              <Link 
+                                key={cat.slug} 
+                                href={`/categories/${cat.slug}`}
+                                className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-brand transition-colors flex items-center justify-between group/cat"
+                              >
+                                {cat.name}
+                                <ArrowRight size={12} className="opacity-0 -translate-x-2 transition-all group-hover/cat:opacity-100 group-hover/cat:translate-x-0" />
+                              </Link>
+                            ))
+                          ) : (
+                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 text-center">Loading Categories...</p>
+                          )}
+                          <div className="pt-4 border-t border-slate-50">
+                            <Link href="/products" className="text-[9px] font-black uppercase tracking-widest text-brand-blue hover:text-brand flex items-center gap-2">
+                              View All Collection <ArrowRight size={10} />
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    href={link.href || "#"}
+                    className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-brand transition-colors py-2 block"
+                  >
+                    {link.label}
+                  </Link>
+                )}
+              </div>
             ))}
           </div>
 
@@ -201,14 +253,33 @@ export default function Navbar() {
                 key={link.label}
                 className={`transform transition-all duration-700 delay-[${i * 100}ms] ${mobileMenuOpen ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}
               >
-                <Link
-                  href={link.href || "#"}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-3xl font-black text-brand-blue uppercase tracking-tighter hover:text-brand transition-colors flex items-center justify-between group"
-                >
-                  {link.label}
-                  <ArrowRight className="opacity-0 -translate-x-4 transition-all group-hover:opacity-100 group-hover:translate-x-0" size={24} />
-                </Link>
+                {link.isDropdown ? (
+                  <div className="space-y-4">
+                    <p className="text-3xl font-black text-brand-blue uppercase tracking-tighter">{link.label}</p>
+                    <div className="grid grid-cols-1 gap-3 pl-4 border-l-2 border-brand/20">
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.slug}
+                          href={`/categories/${cat.slug}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="text-lg font-black text-slate-400 uppercase tracking-widest hover:text-brand transition-colors flex items-center justify-between"
+                        >
+                          {cat.name}
+                          <ArrowRight size={16} />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    href={link.href || "#"}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-3xl font-black text-brand-blue uppercase tracking-tighter hover:text-brand transition-colors flex items-center justify-between group"
+                  >
+                    {link.label}
+                    <ArrowRight className="opacity-0 -translate-x-4 transition-all group-hover:opacity-100 group-hover:translate-x-0" size={24} />
+                  </Link>
+                )}
               </div>
             ))}
           </div>
