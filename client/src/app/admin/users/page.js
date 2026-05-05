@@ -140,8 +140,8 @@ export default function AdminUsersPage() {
             <thead>
               <tr className="bg-slate-50 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-200">
                 <th className="px-4 md:px-6 py-4">User</th>
-                <th className="px-4 md:px-6 py-4">Contact</th>
-                <th className="px-4 md:px-6 py-4">Joined On</th>
+                <th className="px-4 md:px-6 py-4 hidden md:table-cell">Contact</th>
+                <th className="px-4 md:px-6 py-4 hidden md:table-cell">Joined On</th>
                 <th className="px-4 md:px-6 py-4">Role</th>
                 <th className="px-4 md:px-6 py-4 text-right">Actions</th>
               </tr>
@@ -175,7 +175,7 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="px-4 md:px-6 py-4 hidden md:table-cell">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1.5 text-slate-600">
                           <Mail size={12} className="text-slate-300" />
@@ -183,7 +183,7 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="px-4 md:px-6 py-4 hidden md:table-cell">
                       <div className="flex items-center gap-2 text-slate-400">
                         <Calendar size={12} className="text-slate-300" />
                         <span className="text-[10px] font-bold uppercase tracking-widest">

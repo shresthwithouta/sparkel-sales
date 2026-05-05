@@ -174,9 +174,9 @@ export default function AdminProductsPage() {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400">Product Info</th>
-                  <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                  <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Category</th>
                   <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400">Price</th>
-                  <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                  <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Status</th>
                   <th className="px-4 py-4 text-[8px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
                 </tr>
               </thead>
@@ -200,7 +200,7 @@ export default function AdminProductsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 hidden md:table-cell">
                       <span className="px-2 py-0.5 bg-slate-100 text-slate-400 text-[7px] font-black uppercase tracking-widest rounded-full">
                         {product.category?.replace("-", " ") || 'Uncategorized'}
                       </span>
@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-4">
                       <p className="text-[12px] font-bold text-brand-blue">₹{product.price?.toLocaleString("en-IN") || '0'}</p>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 hidden md:table-cell">
                       <div className="flex items-center gap-1.5 text-emerald-500">
                         <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
                         <span className="text-[8px] font-black uppercase tracking-widest">In Stock</span>
