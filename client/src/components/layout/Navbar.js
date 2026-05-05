@@ -159,9 +159,12 @@ export default function Navbar() {
               </Link>
             )}
 
-            <button className="px-5 py-2 bg-brand text-white font-bold uppercase tracking-widest text-[9px] rounded-sm hover:bg-brand-dark transition-all">
+            <Link 
+              href="/inquiry"
+              className="px-5 py-2 bg-brand text-white font-bold uppercase tracking-widest text-[9px] rounded-sm hover:bg-brand-dark transition-all"
+            >
               Inquiry
-            </button>
+            </Link>
           </div>
 
           <button
@@ -238,6 +241,18 @@ export default function Navbar() {
               <ArrowRight size={16} className="text-slate-300" />
             </Link>
             
+            <Link 
+              href="/inquiry"
+              className="flex items-center justify-between bg-brand text-white p-4 rounded-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquare size={20} />
+                <span className="font-black uppercase tracking-tight text-sm">Quick Inquiry</span>
+              </div>
+              <ArrowRight size={16} />
+            </Link>
+
             {isAuthenticated ? (
               <Link 
                 href="/me"
