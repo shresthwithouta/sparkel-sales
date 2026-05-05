@@ -15,26 +15,77 @@ export function CartProvider({ children }) {
   // Guest key
   const guestCartKey = "cart_guest";
 
-  const syncCart = useCallback(async () => {
-    if (isAuthenticated && token) {
-      try {
-        setIsSyncing(true);
-        const data = await fetchCart(token);
-        if (data && data.items) {
-          setCartItems(data.items);
+  const mergeGuestCart = useCallback(async (guestItems, userToken) => {
+    try {
+      setIsSyncing(true);
+      // Fetch current backend cart
+      const backendData = await fetchCart(userToken);
+      const backendItems = backendData.items || [];
+      
+      // Create a map of existing items for quick lookup
+      const itemMap = new Map(backendItems.map(item => [item.slug, item]));
+      
+      const itemsToSync = [];
+      
+      for (const guestItem of guestItems) {
+        if (!itemMap.has(guestItem.slug)) {
+          // If not in backend, we need to add it
+          itemsToSync.push(guestItem);
         }
-      } catch (err) {
-        console.error("Failed to sync cart:", err);
-      } finally {
-        setIsSyncing(false);
-        setIsLoaded(true);
       }
-    } else {
-      const saved = localStorage.getItem(guestCartKey);
-      setCartItems(saved ? JSON.parse(saved) : []);
+
+      // Sync missing items to backend
+      if (itemsToSync.length > 0) {
+        await Promise.all(itemsToSync.map(item => 
+          addToCartApi(userToken, {
+            slug: item.slug,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            quantity: item.quantity
+          })
+        ));
+      }
+      
+      // Clear guest cart from local storage
+      localStorage.removeItem(guestCartKey);
+      
+      // Refresh cart from backend to get the merged state
+      const finalData = await fetchCart(userToken);
+      setCartItems(finalData.items || []);
+    } catch (err) {
+      console.error("Failed to merge guest cart:", err);
+    } finally {
+      setIsSyncing(false);
       setIsLoaded(true);
     }
-  }, [token, isAuthenticated]);
+  }, []);
+
+  const syncCart = useCallback(async () => {
+    const savedGuest = localStorage.getItem(guestCartKey);
+    const guestItems = savedGuest ? JSON.parse(savedGuest) : [];
+
+    if (isAuthenticated && token) {
+      if (guestItems.length > 0) {
+        // Merge guest items into backend
+        await mergeGuestCart(guestItems, token);
+      } else {
+        try {
+          setIsSyncing(true);
+          const data = await fetchCart(token);
+          setCartItems(data?.items || []);
+        } catch (err) {
+          console.error("Failed to sync cart:", err);
+        } finally {
+          setIsSyncing(false);
+          setIsLoaded(true);
+        }
+      }
+    } else {
+      setCartItems(guestItems);
+      setIsLoaded(true);
+    }
+  }, [token, isAuthenticated, mergeGuestCart]);
 
   useEffect(() => {
     syncCart();

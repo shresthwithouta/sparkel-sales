@@ -41,27 +41,25 @@ export default function CheckoutPage() {
     country: user?.address?.country || "India"
   });
 
-  // Remove force login for guest checkout support
-  /*
+  // Guest checkout support is enabled
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/auth/login?redirect=/checkout");
-    }
-  }, [authLoading, isAuthenticated, router]);
-  */
+    // We allow both authenticated users and guests to proceed to checkout
+    // No redirect to login is enforced here
+  }, [isAuthenticated]);
 
+  // Autofill form when user data is available, but don't overwrite manual edits
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        name: user.name || prev.name,
-        email: user.email || prev.email,
-        phone: user.phone || prev.phone,
-        address: user.address?.street || prev.address,
-        city: user.address?.city || prev.city,
-        state: user.address?.state || prev.state,
-        zipCode: user.address?.zipCode || prev.zipCode,
-        country: user.address?.country || prev.country
+        name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
+        address: prev.address || user.address?.street || "",
+        city: prev.city || user.address?.city || "",
+        state: prev.state || user.address?.state || "",
+        zipCode: prev.zipCode || user.address?.zipCode || "",
+        country: prev.country || user.address?.country || "India"
       }));
     }
   }, [user]);
