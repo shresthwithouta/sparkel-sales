@@ -9,6 +9,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProductCard({ product }) {
+  if (!product) return null;
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();

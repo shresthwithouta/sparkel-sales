@@ -25,9 +25,14 @@ export default function CategoryDetailPage({ params }) {
           fetchCategories()
         ]);
         
-        const currentCat = categoriesData.categories.find(c => c.slug === slug);
-        setCategory(currentCat);
-        setProducts(productsData.products);
+        if (categoriesData && categoriesData.categories) {
+          const currentCat = categoriesData.categories.find(c => c.slug === slug);
+          setCategory(currentCat);
+        }
+        
+        if (productsData && productsData.products) {
+          setProducts(productsData.products);
+        }
       } catch (err) {
         console.error("Error loading category data:", err);
         setError("Failed to load category.");
