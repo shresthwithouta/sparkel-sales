@@ -52,7 +52,7 @@ export default function HeroSection() {
   }, [nextSlide]);
 
   return (
-    <section className="relative w-full h-[45vh] md:h-[75vh] bg-white overflow-hidden group">
+    <section className="relative w-full h-[50vh] md:h-[85vh] bg-white overflow-hidden group pt-14 md:pt-20">
       {}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, idx) => (
