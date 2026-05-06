@@ -202,9 +202,9 @@ export default function Navbar() {
               </>
             )}
 
-            {mounted && isAuthenticated ? (
+            {isAuthenticated ? (
               <Link href="/me" className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full overflow-hidden border border-brand-dark flex items-center justify-center bg-brand text-white">
+                <div className="w-7 h-7 rounded-full overflow-hidden border border-brand-dark flex items-center justify-center bg-brand text-white relative">
                   {user?.avatar ? (
                     <Image src={user.avatar} alt={user.name} fill className="object-cover" />
                   ) : (
