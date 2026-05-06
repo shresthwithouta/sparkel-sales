@@ -19,6 +19,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
@@ -42,6 +43,17 @@ export default function Navbar() {
     loadCategories();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [mobileMenuOpen]);
 
   if (pathname?.startsWith("/admin")) {
     return null;
@@ -219,33 +231,49 @@ export default function Navbar() {
 
           <button
             className="lg:hidden p-2 text-brand-blue"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open Menu"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            <Menu size={20} />
           </button>
         </div>
       </div>
 
-      {}
+      {/* Mobile Menu Overlay */}
       <div 
-        className={`lg:hidden fixed inset-0 bg-white z-40 transition-all duration-500 ease-in-out ${
-          mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+        className={`lg:hidden fixed inset-0 bg-white z-[60] transition-all duration-500 ease-in-out overflow-y-auto ${
+          mobileMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
         }`}
       >
-        <div className="flex flex-col h-full justify-between p-8 pt-24 pb-12">
+        <div className="flex flex-col min-h-full p-8 pt-24 pb-12 relative">
+          {/* Close Button Inside Menu */}
+          <button
+            className="absolute top-6 right-6 p-2 text-brand-blue bg-slate-50 rounded-full"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close Menu"
+          >
+            <X size={24} />
+          </button>
           <div className="space-y-6">
             <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-[8px] mb-6">Menu</p>
             {NAV_LINKS.map((link) => (
               <div key={link.label}>
                 {link.isDropdown ? (
                   <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-300">{link.label}</p>
-                    <div className="grid gap-4 pl-4 border-l border-slate-100">
+                    <button 
+                      onClick={() => setMobileCategoriesOpen(!mobileCategoriesOpen)}
+                      className="w-full flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-brand"
+                    >
+                      {link.label}
+                      <ArrowRight size={14} className={`transition-transform duration-300 ${mobileCategoriesOpen ? 'rotate-90 text-brand' : ''}`} />
+                    </button>
+                    
+                    <div className={`grid gap-4 pl-4 border-l-2 border-slate-50 overflow-hidden transition-all duration-300 ${mobileCategoriesOpen ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                       {categories.map((cat) => (
                         <Link
                           key={cat.slug}
                           href={`/categories/${cat.slug}`}
-                          className="text-xl font-black text-brand-blue uppercase tracking-tight block"
+                          className="text-2xl font-black text-brand-blue uppercase tracking-tight block hover:text-brand transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {cat.name}
