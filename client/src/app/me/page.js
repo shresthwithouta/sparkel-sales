@@ -90,8 +90,8 @@ export default function UserDashboard() {
   if (!isAuthenticated) return null
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 pt-32 pb-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-black text-brand-blue uppercase tracking-tight mb-2">
             Welcome Back, {user?.name?.split(' ')[0]}!
@@ -99,9 +99,9 @@ export default function UserDashboard() {
           <p className="text-slate-600">Manage your account and orders</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-32">
               <div className="bg-linear-to-br from-brand to-brand-dark p-6 text-white text-center">
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center overflow-hidden border-2 border-white/30 relative">
                   {user?.avatar ? (
@@ -132,10 +132,21 @@ export default function UserDashboard() {
                   Overview
                 </button>
                 <button
+                  onClick={() => setActiveTab('orders')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition ${
+                    activeTab === 'orders'
+                      ? 'bg-brand text-white shadow-md'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <ShoppingBag size={18} />
+                  Orders
+                </button>
+                <button
                   onClick={() => setActiveTab('profile')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition ${
                     activeTab === 'profile'
-                      ? 'bg-brand text-white'
+                      ? 'bg-brand text-white shadow-md'
                       : 'text-slate-700 hover:bg-slate-100'
                   }`}
                 >
@@ -168,7 +179,7 @@ export default function UserDashboard() {
             </div>
           </div>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-9 animate-reveal">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
