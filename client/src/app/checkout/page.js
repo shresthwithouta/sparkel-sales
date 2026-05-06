@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { 
   CreditCard, 
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const { user, token, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { showToast } = useToast();
   
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("qr");
@@ -72,7 +74,7 @@ export default function CheckoutPage() {
   const handleProcessOrder = async () => {
     if (step === 1) {
       if (!formData.name || !formData.email || !formData.phone || !formData.address) {
-        alert("Please fill in all required fields.");
+        showToast("Please fill in all required fields.", "error");
         return;
       }
       setStep(2);
@@ -93,9 +95,10 @@ export default function CheckoutPage() {
 
         // If authenticated, token is used. If guest, token is null and backend must handle it.
         await createOrder(token, orderData);
+        clearCart();
         setStep(3);
       } catch (err) {
-        alert(err.message || "Failed to place order. Please try again.");
+        showToast(err.message || "Failed to place order. Please try again.", "error");
       } finally {
         setIsProcessing(false);
       }
@@ -125,7 +128,6 @@ export default function CheckoutPage() {
         </p>
         <Link 
           href="/" 
-          onClick={() => clearCart()}
           className="bg-brand-blue text-white py-4 px-10 rounded-sm font-black uppercase tracking-widest text-[10px] hover:bg-brand transition-all shadow-lg"
         >
           Back to Home

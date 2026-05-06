@@ -220,7 +220,7 @@ export default function BannersPage() {
 
       {isAddingBanner && (
         <div className="fixed inset-0 bg-brand-blue/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-lg rounded-sm shadow-2xl overflow-hidden animate-reveal">
+          <div className="bg-white w-full max-w-lg rounded-sm shadow-2xl overflow-hidden animate-reveal">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">
                 {editingBanner ? "Edit Banner" : "Add New Banner"}

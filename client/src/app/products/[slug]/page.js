@@ -181,7 +181,7 @@ export default function ProductDetailPage({ params }) {
                   Inquire Now
                 </button>
                 <a 
-                  href={`tel:${settings?.phone || "+919831012345"}`}
+                  href={`tel:${(settings?.phone || "+919831012345").replace(/[^\d+]/g, '')}`}
                   className="flex-1 border-2 border-brand-blue text-brand-blue py-5 px-8 rounded-sm font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-brand-blue hover:text-white transition-all group"
                 >
                   <Phone size={18} />

@@ -10,7 +10,8 @@ import {
   Trash2, 
   MoreVertical,
   X,
-  Loader2
+  Loader2,
+  Image as ImageIcon
 } from "lucide-react";
 import Image from "next/image";
 

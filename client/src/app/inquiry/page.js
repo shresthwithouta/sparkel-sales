@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Send, Phone, Mail, MapPin, CheckCircle2, Loader2, MessageSquare } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { createInquiry } from "@/lib/api";
 
 export default function InquiryPage() {
@@ -35,8 +33,6 @@ export default function InquiryPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Navbar />
-      
       <div className="pt-32 pb-20">
         <div className="container-wide">
           <div className="max-w-6xl mx-auto">
@@ -183,8 +179,6 @@ export default function InquiryPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 }

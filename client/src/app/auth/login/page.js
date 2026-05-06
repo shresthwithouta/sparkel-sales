@@ -104,9 +104,9 @@ function LoginForm() {
                 placeholder="Password"
               />
               <div className="text-right">
-                <Link href="#" className="text-[10px] font-bold text-brand uppercase tracking-widest hover:text-brand-dark transition-colors">
+                <button type="button" onClick={() => alert("Forgot password feature coming soon!")} className="text-[10px] font-bold text-brand uppercase tracking-widest hover:text-brand-dark transition-colors">
                   Forgot?
-                </Link>
+                </button>
               </div>
             </div>
 

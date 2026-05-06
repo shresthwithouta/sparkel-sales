@@ -113,19 +113,30 @@ export default function CartPage() {
 
                     <div className="flex items-center justify-between w-full md:justify-center md:w-auto mt-2 md:mt-0 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-sm border border-slate-100 md:border-0">
                       <span className="md:hidden text-[9px] font-black uppercase tracking-widest text-slate-400">Quantity</span>
-                      <div className="flex items-center border border-slate-200 rounded-sm bg-white overflow-hidden shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center border border-slate-200 rounded-sm bg-white overflow-hidden shadow-sm">
+                          <button 
+                            onClick={() => updateQuantity(item.slug, item.quantity - 1)}
+                            className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
+                            title="Decrease Quantity"
+                          >
+                            <Minus size={10} className="md:w-3 md:h-3" />
+                          </button>
+                          <span className="w-8 md:w-10 text-center text-[10px] md:text-xs font-black text-brand-blue">{item.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(item.slug, item.quantity + 1)}
+                            className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
+                            title="Increase Quantity"
+                          >
+                            <Plus size={10} className="md:w-3 md:h-3" />
+                          </button>
+                        </div>
                         <button 
-                          onClick={() => updateQuantity(item.slug, item.quantity - 1)}
-                          className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
+                          onClick={() => removeFromCart(item.slug)}
+                          className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                          title="Remove from Cart"
                         >
-                          <Minus size={10} className="md:w-3 md:h-3" />
-                        </button>
-                        <span className="w-8 md:w-10 text-center text-[10px] md:text-xs font-black text-brand-blue">{item.quantity}</span>
-                        <button 
-                          onClick={() => updateQuantity(item.slug, item.quantity + 1)}
-                          className="p-2 md:p-3 hover:bg-slate-50 transition-colors text-slate-400 hover:text-brand"
-                        >
-                          <Plus size={10} className="md:w-3 md:h-3" />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -137,16 +148,6 @@ export default function CartPage() {
                     <div className="md:hidden w-full pt-3 border-t border-slate-100 flex justify-between items-center">
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Subtotal</span>
                       <p className="text-xs font-black text-brand-blue">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
-                    </div>
-
-                    <div className="hidden md:block">
-                      <button 
-                        onClick={() => removeFromCart(item.slug)}
-                        className="p-2 text-slate-300 hover:text-red-500 transition-colors"
-                        title="Remove Item"
-                      >
-                        <Trash2 size={16} />
-                      </button>
                     </div>
                   </div>
                 ))}

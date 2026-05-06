@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { 
   User, 
   Settings, 
@@ -13,7 +14,9 @@ import {
   LogOut,
   Calendar,
   Edit2,
-  LayoutDashboard
+  LayoutDashboard,
+  ArrowLeft,
+  Loader2
 } from 'lucide-react'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { fetchUserOrders } from '@/lib/api'
@@ -25,14 +28,20 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('overview')
   const [orders, setOrders] = useState([])
   const [fetchingOrders, setFetchingOrders] = useState(false)
+  const [totalOrders, setTotalOrders] = useState(0)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
 
   useEffect(() => {
     const loadOrders = async () => {
       if (!isAuthenticated || !token) return
       try {
         setFetchingOrders(true)
-        const data = await fetchUserOrders(token)
+        const data = await fetchUserOrders(token, 50)
         setOrders(data.orders || [])
+        setTotalOrders(data.total || 0)
+        setHasMore(data.pages > 1)
+        setPage(1)
       } catch (error) {
         console.error('Failed to fetch orders:', error)
       } finally {
@@ -44,6 +53,22 @@ export default function UserDashboard() {
       loadOrders()
     }
   }, [isAuthenticated, token])
+
+  const loadMoreOrders = async () => {
+    if (!hasMore || fetchingOrders) return
+    try {
+      setFetchingOrders(true)
+      const nextPage = page + 1
+      const data = await fetchUserOrders(token, 50, nextPage)
+      setOrders(prev => [...prev, ...(data.orders || [])])
+      setPage(nextPage)
+      setHasMore(data.pages > nextPage)
+    } catch (error) {
+      console.error('Failed to fetch more orders:', error)
+    } finally {
+      setFetchingOrders(false)
+    }
+  }
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -80,7 +105,7 @@ export default function UserDashboard() {
               <div className="bg-linear-to-br from-brand to-brand-dark p-6 text-white text-center">
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden border-2 border-white/30">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
                   ) : (
                     <User size={32} />
                   )}
@@ -151,7 +176,7 @@ export default function UserDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-slate-600 text-sm font-medium">Total Orders</p>
-                        <p className="text-3xl font-black text-brand-blue mt-1">{orders.length}</p>
+                        <p className="text-3xl font-black text-brand-blue mt-1">{totalOrders}</p>
                       </div>
                       <ShoppingBag size={40} className="text-slate-200" />
                     </div>
@@ -215,8 +240,102 @@ export default function UserDashboard() {
                         onClick={() => setActiveTab('orders')}
                         className="w-full py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-brand transition-colors"
                       >
-                        View All Orders
+                        View All Orders {totalOrders > 0 && `(${totalOrders})`}
                       </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'orders' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-sm p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="font-bold text-lg text-brand-blue uppercase tracking-tight">Your Orders</h3>
+                    <button 
+                      onClick={() => setActiveTab('overview')}
+                      className="text-[10px] font-black text-slate-400 hover:text-brand uppercase tracking-widest flex items-center gap-2"
+                    >
+                      <ArrowLeft size={14} /> Back to Overview
+                    </button>
+                  </div>
+                  
+                  {fetchingOrders ? (
+                    <div className="text-center py-20">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand mx-auto mb-4"></div>
+                      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Syncing Orders...</p>
+                    </div>
+                  ) : orders.length === 0 ? (
+                    <div className="text-center py-20 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                      <ShoppingBag size={48} className="text-slate-200 mx-auto mb-4" />
+                      <p className="text-slate-500 font-bold">You haven't placed any orders yet.</p>
+                      <Link href="/products" className="inline-block mt-6 px-8 py-3 bg-brand text-white rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-brand-dark transition shadow-lg shadow-brand/20">
+                        Start Shopping
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {orders.map(order => (
+                        <div key={order._id} className="border border-slate-100 rounded-lg overflow-hidden group hover:border-brand/30 transition-all hover:shadow-xl hover:shadow-slate-200/50">
+                          <div className="bg-slate-50 px-6 py-4 flex flex-wrap justify-between items-center gap-4 border-b border-slate-100">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand shadow-sm">
+                                <ShoppingBag size={20} />
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order ID</p>
+                                <p className="text-xs font-bold text-brand-blue uppercase tracking-tight">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                              </div>
+                            </div>
+                            <div className="hidden sm:block">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date Placed</p>
+                              <p className="text-xs font-bold text-brand-blue">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Amount</p>
+                              <p className="text-xs font-black text-brand">₹{order.total?.toLocaleString("en-IN")}</p>
+                            </div>
+                            <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                              order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                              order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                              'bg-brand/10 text-brand border-brand/20'
+                            }`}>
+                              {order.status}
+                            </div>
+                          </div>
+                          <div className="p-6">
+                            <div className="flex flex-wrap gap-4">
+                              {order.items?.slice(0, 4).map((item, idx) => (
+                                <div key={idx} className="w-16 h-16 bg-white border border-slate-100 rounded-sm p-1 relative group-hover:border-brand/20 transition-colors">
+                                  <Image src={item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain p-1" />
+                                </div>
+                              ))}
+                              {order.items?.length > 4 && (
+                                <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-sm flex items-center justify-center text-[10px] font-black text-slate-400">
+                                  +{order.items.length - 4} MORE
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {hasMore && (
+                        <button
+                          onClick={loadMoreOrders}
+                          disabled={fetchingOrders}
+                          className="w-full py-4 border-2 border-dashed border-slate-200 rounded-lg text-xs font-black uppercase tracking-widest text-slate-400 hover:text-brand hover:border-brand/30 transition-all flex items-center justify-center gap-2"
+                        >
+                          {fetchingOrders ? (
+                            <>
+                              <Loader2 className="animate-spin" size={16} /> Loading More...
+                            </>
+                          ) : (
+                            'Load More Orders'
+                          )}
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

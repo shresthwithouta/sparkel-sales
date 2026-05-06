@@ -67,7 +67,7 @@ export default function HeroSection() {
               alt={slide.title} 
               fill 
               className="object-cover md:object-contain lg:object-cover object-center"
-              priority={idx === 0}
+              priority
             />
             {}
             <div className="absolute inset-0 bg-linear-to-r from-white via-white/20 md:via-white/40 to-transparent z-10" />

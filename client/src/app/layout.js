@@ -8,7 +8,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
+import { ToastProvider } from "@/contexts/ToastContext";
 import { SITE_CONFIG } from "@/lib/constants";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const outfit = Outfit({ 
   subsets: ["latin"],
@@ -59,24 +61,30 @@ export const metadata = {
   },
 };
 
+
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
       <body className="font-inter">
-        <AuthProvider>
-          <GoogleAuthProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <SmoothScroll>
-                  <Navbar />
-                  <main>{children}</main>
-                  <Footer />
-                  <WhatsAppFloat />
-                </SmoothScroll>
-              </WishlistProvider>
-            </CartProvider>
-          </GoogleAuthProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <ToastProvider>
+            <AuthProvider>
+              <GoogleAuthProvider>
+                <CartProvider>
+                  <WishlistProvider>
+                    <SmoothScroll>
+                      <Navbar />
+                      <main>{children}</main>
+                      <Footer />
+                      <WhatsAppFloat />
+                    </SmoothScroll>
+                  </WishlistProvider>
+                </CartProvider>
+              </GoogleAuthProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

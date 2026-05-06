@@ -150,7 +150,7 @@ export default function Navbar() {
                             {cartItems.map((item) => (
                               <div key={item.slug} className="flex gap-4">
                                 <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden shrink-0">
-                                  <img src={item.images?.[0] || item.image} alt={item.name} className="w-full h-full object-contain" />
+                                  <Image src={item.images?.[0] || item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[10px] font-black text-brand-blue uppercase leading-tight truncate mb-1">{item.name}</p>
@@ -194,7 +194,7 @@ export default function Navbar() {
               <Link href="/me" className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-brand-dark flex items-center justify-center bg-brand text-white">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
                   ) : (
                     <User size={14} />
                   )}

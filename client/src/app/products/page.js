@@ -14,16 +14,26 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
+        const params = { limit: 12, page: 1 };
+        if (selectedCategory !== "all") params.category = selectedCategory;
+
         const [productsData, categoriesData] = await Promise.all([
-          fetchProducts(selectedCategory !== "all" ? { category: selectedCategory } : {}),
+          fetchProducts(params),
           fetchCategories()
         ]);
-        setProducts(productsData.products);
-        setCategories(categoriesData.categories);
+        
+        setProducts(productsData.products || []);
+        setHasMore(productsData.page < productsData.pages);
+        setPage(1);
+        setCategories(categoriesData.categories || []);
         setError(null);
       } catch (err) {
         console.error("Error loading products:", err);
@@ -36,9 +46,29 @@ export default function ProductsPage() {
     loadData();
   }, [selectedCategory]);
 
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const params = { limit: 12, page: nextPage };
+      if (selectedCategory !== "all") params.category = selectedCategory;
+      
+      const productsData = await fetchProducts(params);
+      
+      setProducts(prev => [...prev, ...(productsData.products || [])]);
+      setHasMore(productsData.page < productsData.pages);
+      setPage(nextPage);
+    } catch (err) {
+      console.error("Failed to load more products:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   const filteredProducts = products.filter((product) => {
-    return product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return (product.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+           (product.description || "").toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   return (
@@ -105,11 +135,28 @@ export default function ProductsPage() {
             </button>
           </div>
         ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 lg:gap-12">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.slug} product={product} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 lg:gap-12">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
+            </div>
+            {hasMore && !searchQuery && (
+              <div className="mt-16 flex justify-center">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-8 py-3 bg-slate-100 text-brand-blue font-black uppercase tracking-widest text-[10px] rounded-sm hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {loadingMore ? (
+                    <><Loader2 className="animate-spin" size={14} /> Loading...</>
+                  ) : (
+                    "Load More Products"
+                  )}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20 border border-dashed border-slate-200 rounded-sm">
             <p className="text-slate-500 font-medium">No products found matching your criteria.</p>

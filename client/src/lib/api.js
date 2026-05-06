@@ -5,16 +5,25 @@ const apiRequest = async (endpoint, options = {}) => {
   const { token, ...fetchOptions } = options;
   
   const headers = {
-    'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
     ...fetchOptions.headers,
   };
+
+  // Only set application/json if body is not FormData
+  if (!(fetchOptions.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   try {
     const res = await fetch(`${API_URL}${endpoint}`, {
       ...fetchOptions,
       headers,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     // Handle 401 Unauthorized globally
     if (res.status === 401) {
@@ -128,9 +137,9 @@ export const updateUserProfile = (token, profileData) =>
 export const createOrder = (token, orderData) => 
   apiRequest('/orders', { method: 'POST', token, body: JSON.stringify(orderData) });
 
-export const fetchUserOrders = async (token) => {
+export const fetchUserOrders = async (token, limit = 10, page = 1) => {
   try {
-    return await apiRequest('/orders/me', { token });
+    return await apiRequest(`/orders/me?limit=${limit}&page=${page}`, { token });
   } catch (error) {
     return { orders: [] };
   }
@@ -213,16 +222,15 @@ export const updateOrderStatus = (token, id, status) =>
 export const fetchAllOrders = (token) => 
   apiRequest('/admin/orders', { token });
 
-export const uploadImage = (token, formData) => 
-  fetch(`${API_URL}/upload`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` },
-    body: formData,
-  }).then(res => {
-    if (res.status === 401) window.dispatchEvent(new CustomEvent('unauthorized'));
-    if (!res.ok) throw new Error('Upload failed');
-    return res.json();
-  });
+export const uploadImage = (token, formData) => {
+  // Client-side validation: Max 5MB, images only
+  const file = formData.get('image');
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) throw new Error("File size exceeds 5MB limit");
+    if (!file.type.startsWith('image/')) throw new Error("Only image files are allowed");
+  }
+  return apiRequest('/upload', { method: 'POST', body: formData });
+};
 
 export const fetchUsers = (token) => 
   apiRequest('/admin/users', { token });

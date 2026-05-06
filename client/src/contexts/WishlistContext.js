@@ -1,77 +1,34 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { fetchWishlist, addToWishlist, removeFromWishlist } from "@/lib/api";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { fetchWishlist, addToWishlist, removeFromWishlist, clearWishlistApi } from "@/lib/api";
+import { useToast } from "./ToastContext";
 import { useAuth } from "./AuthContext";
+import { useGuestSync } from "@/hooks/useGuestSync";
 
 const WishlistContext = createContext(null);
 
 export function WishlistProvider({ children }) {
   const { token, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [wishlistItems, setWishlistItems] = useState([]);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { syncWithGuest, syncToStorage, isSyncing, isLoaded } = useGuestSync(
+    "wishlist_guest",
+    fetchWishlist,
+    addToWishlist
+  );
 
-  const guestWishlistKey = "wishlist_guest";
-
-  const mergeWishlist = useCallback(async (guestItems, userToken) => {
-    try {
-      setIsSyncing(true);
-      const backendData = await fetchWishlist(userToken);
-      const backendItems = backendData.items || [];
-      const itemMap = new Set(backendItems.map(item => item.slug));
-      
-      const itemsToSync = guestItems.filter(item => !itemMap.has(item.slug));
-
-      if (itemsToSync.length > 0) {
-        await Promise.all(itemsToSync.map(item => addToWishlist(userToken, item)));
-      }
-      
-      localStorage.removeItem(guestWishlistKey);
-      const finalData = await fetchWishlist(userToken);
-      setWishlistItems(finalData.items || []);
-    } catch (err) {
-      console.error("Failed to merge wishlist:", err);
-    } finally {
-      setIsSyncing(false);
-      setIsLoaded(true);
-    }
-  }, []);
+  const syncWishlist = useCallback(() => {
+    syncWithGuest(isAuthenticated, token, setWishlistItems);
+  }, [isAuthenticated, token, syncWithGuest]);
 
   useEffect(() => {
-    const syncWishlist = async () => {
-      const savedGuest = localStorage.getItem(guestWishlistKey);
-      const guestItems = savedGuest ? JSON.parse(savedGuest) : [];
-
-      if (isAuthenticated && token) {
-        if (guestItems.length > 0) {
-          await mergeWishlist(guestItems, token);
-        } else {
-          try {
-            setIsSyncing(true);
-            const data = await fetchWishlist(token);
-            setWishlistItems(data?.items || []);
-          } catch (err) {
-            console.error("Failed to sync wishlist:", err);
-          } finally {
-            setIsSyncing(false);
-            setIsLoaded(true);
-          }
-        }
-      } else {
-        setWishlistItems(guestItems);
-        setIsLoaded(true);
-      }
-    };
     syncWishlist();
-  }, [token, isAuthenticated, mergeWishlist]);
+  }, [syncWishlist]);
 
-  // Sync guest wishlist to local storage
   useEffect(() => {
-    if (isLoaded && !isAuthenticated) {
-      localStorage.setItem(guestWishlistKey, JSON.stringify(wishlistItems));
-    }
-  }, [wishlistItems, isLoaded, isAuthenticated]);
+    syncToStorage(wishlistItems, isAuthenticated, isLoaded);
+  }, [wishlistItems, isLoaded, isAuthenticated, syncToStorage]);
 
   const toggleWishlist = async (product) => {
     const exists = wishlistItems.some((item) => item.slug === product.slug);
@@ -83,6 +40,7 @@ export function WishlistProvider({ children }) {
           await removeFromWishlist(token, product.slug);
         } else {
           setWishlistItems(prev => [...prev, product]);
+          showToast(`Saved ${product.name} to wishlist`);
           await addToWishlist(token, product);
         }
       } catch (err) {
@@ -114,18 +72,18 @@ export function WishlistProvider({ children }) {
     }
   };
 
+  const value = useMemo(() => ({
+    wishlistItems,
+    wishlistCount: wishlistItems.length,
+    toggleWishlist,
+    isInWishlist,
+    clearWishlist,
+    isSyncing,
+    isLoaded
+  }), [wishlistItems, toggleWishlist, isInWishlist, clearWishlist, isSyncing, isLoaded]);
+
   return (
-    <WishlistContext.Provider
-      value={{
-        wishlistItems,
-        wishlistCount: wishlistItems.length,
-        toggleWishlist,
-        isInWishlist,
-        clearWishlist,
-        isSyncing,
-        isLoaded
-      }}
-    >
+    <WishlistContext.Provider value={value}>
       {children}
     </WishlistContext.Provider>
   );

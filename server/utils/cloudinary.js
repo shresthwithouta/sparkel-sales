@@ -1,11 +1,15 @@
 import { v2 as cloudinary } from 'cloudinary'
 import { Readable } from 'stream'
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config(true); // Automatically uses CLOUDINARY_URL from process.env
+} else {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
 
 export const uploadToCloudinary = (buffer, folder = 'sparkel-sales') => {
   return new Promise((resolve, reject) => {

@@ -17,6 +17,10 @@
     overflow-x: hidden;
   }
 
+  button {
+    cursor: pointer;
+  }
+
   ::selection {
     background-color: var(--color-brand);
     color: white;
