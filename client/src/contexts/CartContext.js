@@ -8,21 +8,23 @@ import { useGuestSync } from "@/hooks/useGuestSync";
 
 const CartContext = createContext(null);
 
+const cartApiAdd = (token, item) => addToCartApi(token, {
+  slug: item.slug,
+  name: item.name,
+  price: item.price,
+  image: item.image || item.images?.[0],
+  quantity: item.quantity
+});
+
 export function CartProvider({ children }) {
-  const { token, isAuthenticated, user } = useAuth();
+  const { token, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const [cartItems, setCartItems] = useState([]);
 
   const { syncWithGuest, syncToStorage, isSyncing, isLoaded } = useGuestSync(
     "cart_guest",
     fetchCart,
-    (token, item) => addToCartApi(token, {
-      slug: item.slug,
-      name: item.name,
-      price: item.price,
-      image: item.image || item.images?.[0],
-      quantity: item.quantity
-    })
+    cartApiAdd
   );
 
   const syncCart = useCallback(() => {
