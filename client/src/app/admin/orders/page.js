@@ -183,18 +183,20 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-slate-100">
+              <div className="pt-8 border-t border-slate-100 pb-10">
                 <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Update Order Status</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].map((status) => (
                     <button 
                       key={status}
                       disabled={isUpdating || selectedOrder.status === status}
                       onClick={() => handleUpdateStatus(selectedOrder._id, status)}
-                      className={`py-3 text-[9px] font-black uppercase tracking-widest rounded-sm transition-colors border ${
+                      className={`py-2.5 px-1 text-[8px] font-black uppercase tracking-widest rounded-sm transition-colors border ${
                         selectedOrder.status === status 
-                        ? 'bg-slate-100 text-slate-400 border-slate-200' 
-                        : 'bg-white text-brand-blue border-slate-200 hover:border-brand hover:text-brand'
+                        ? 'bg-slate-50 text-slate-300 border-slate-100' 
+                        : status === 'cancelled' 
+                          ? 'bg-white text-rose-400 border-rose-100 hover:border-rose-400 hover:text-rose-500 col-span-2 mt-1'
+                          : 'bg-white text-brand-blue border-slate-200 hover:border-brand hover:text-brand'
                       }`}
                     >
                       {status}
