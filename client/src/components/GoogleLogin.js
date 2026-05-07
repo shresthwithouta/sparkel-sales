@@ -43,15 +43,18 @@ function GoogleLoginInner() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 p-6 bg-slate-50/50 rounded-xl border border-slate-100/50">
       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sign in with Google</p>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={handleError}
-        useOneTap
-        disabled={loading}
-      />
+      {error && <p className="text-red-500 text-xs font-bold uppercase tracking-widest">{error}</p>}
+      <div className="w-full flex justify-center">
+        <GoogleLogin
+          onSuccess={handleSuccess}
+          onError={handleError}
+          useOneTap
+          disabled={loading}
+          width="100%"
+        />
+      </div>
     </div>
   )
 }
