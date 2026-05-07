@@ -44,6 +44,7 @@ function GoogleLoginInner() {
 
   return (
     <div className="flex flex-col items-center gap-4">
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sign in with Google</p>
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <GoogleLogin
         onSuccess={handleSuccess}
