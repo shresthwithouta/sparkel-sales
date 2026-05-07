@@ -143,6 +143,16 @@ export default function AdminOrdersPage() {
       {selectedOrder && (
         <div className="fixed inset-0 z-[100] flex justify-end">
           <style dangerouslySetInnerHTML={{ __html: `
+            /* Hide main page scrollbar */
+            body {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+            body::-webkit-scrollbar {
+              display: none;
+            }
+
+            /* Keep aside scrollbar visible */
             .scrollbar-visible::-webkit-scrollbar {
               width: 6px !important;
               display: block !important;
