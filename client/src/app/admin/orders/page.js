@@ -139,20 +139,36 @@ export default function AdminOrdersPage() {
         )}
       </div>
 
-      <div className="lg:col-span-1">
-        {selectedOrder ? (
-          <div className="bg-white border border-slate-200 rounded-sm p-8 sticky top-32 animate-reveal flex flex-col h-[calc(100vh-160px)]">
-            <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-100 shrink-0">
-              <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">Order Details</h2>
-              <button onClick={() => setSelectedOrder(null)} className="text-slate-300 hover:text-brand">
+      {/* Order Details Slide-over Aside */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-[100] flex justify-end">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
+            onClick={() => setSelectedOrder(null)} 
+          />
+          
+          {/* Aside Panel */}
+          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+              <div>
+                <h2 className="text-[10px] font-black text-brand-blue uppercase tracking-widest">Order Management</h2>
+                <p className="text-xs font-bold text-slate-500 mt-1">#{selectedOrder._id.substring(selectedOrder._id.length - 8).toUpperCase()}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedOrder(null)} 
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-400 hover:text-brand hover:border-brand transition-all"
+              >
                 <ChevronRight size={20} />
               </button>
             </div>
 
-            <div className="space-y-8 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-10">
-              {/* Update Status Section (Moved to top for visibility) */}
-              <div className="bg-slate-50 p-5 rounded-sm border border-slate-100">
-                <label className="text-[9px] font-black uppercase tracking-widest text-brand-blue mb-4 block">Update Order Status</label>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+              {/* Update Status Section */}
+              <div className="bg-brand/5 p-6 rounded-sm border border-brand/10">
+                <label className="text-[9px] font-black uppercase tracking-widest text-brand mb-4 block">Update Order Status</label>
                 <div className="grid grid-cols-2 gap-2">
                   {['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].map((status) => (
                     <button 
@@ -177,45 +193,42 @@ export default function AdminOrdersPage() {
                 <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Items Summary</label>
                 <div className="space-y-4">
                   {selectedOrder.items?.map((item, idx) => (
-                    <div key={idx} className="flex gap-4">
-                      <div className="w-12 h-12 bg-slate-50 rounded-sm overflow-hidden border border-slate-100 relative shrink-0">
+                    <div key={idx} className="flex gap-4 p-3 bg-slate-50 rounded-sm border border-slate-100">
+                      <div className="w-14 h-14 bg-white rounded-sm overflow-hidden border border-slate-200 relative shrink-0">
                         <Image src={item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" />
                       </div>
                       <div className="flex-1">
                         <p className="text-[10px] font-black text-brand-blue uppercase leading-tight">{item.name}</p>
-                        <p className="text-[10px] text-slate-400 font-bold">QTY: {item.quantity} × ₹{item.price?.toLocaleString("en-IN")}</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-1">QTY: {item.quantity} × ₹{item.price?.toLocaleString("en-IN")}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center">
+                <div className="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Amount</p>
-                   <p className="text-lg font-black text-brand flex items-center gap-1">
-                     <IndianRupee size={16} /> {selectedOrder.total?.toLocaleString("en-IN")}
+                   <p className="text-xl font-black text-brand flex items-center gap-1">
+                     <IndianRupee size={20} /> {selectedOrder.total?.toLocaleString("en-IN")}
                    </p>
                 </div>
               </div>
 
-              <div>
+              <div className="pb-10">
                 <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Shipping Address</label>
                 <div className="bg-slate-50 p-6 rounded-sm border border-slate-100 text-slate-600 text-xs leading-relaxed font-medium">
-                  <p className="text-brand-blue font-black mb-2 uppercase">{selectedOrder.shipping?.name}</p>
-                  <p>{selectedOrder.shipping?.address}</p>
-                  <p>{selectedOrder.shipping?.city}, {selectedOrder.shipping?.pincode}</p>
-                  <p className="mt-4 text-brand-blue font-bold">Phone: {selectedOrder.shipping?.phone}</p>
+                  <p className="text-brand-blue font-black mb-3 uppercase tracking-tight">{selectedOrder.shipping?.name}</p>
+                  <p className="mb-1">{selectedOrder.shipping?.address}</p>
+                  <p className="mb-4">{selectedOrder.shipping?.city}, {selectedOrder.shipping?.pincode}</p>
+                  <div className="pt-4 border-t border-slate-200">
+                    <p className="text-brand-blue font-bold flex items-center gap-2">
+                      <span className="text-[9px] uppercase tracking-widest text-slate-400">Phone:</span> {selectedOrder.shipping?.phone}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="bg-slate-100 border border-dashed border-slate-300 rounded-sm p-12 text-center h-[400px] flex flex-col items-center justify-center space-y-4">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300">
-              <Package size={32} />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Select an order to view details</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
