@@ -38,7 +38,7 @@ export default function JobsPage() {
     try {
       await applyForJob({
         ...formData,
-        jobTitle: selectedJob.title
+        position: selectedJob.title
       });
       setStatus({ loading: false, success: true, error: null });
       setFormData({ name: "", email: "", phone: "", message: "" });
