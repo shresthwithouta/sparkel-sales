@@ -17,6 +17,8 @@ export default function BannersPage() {
 
   const [formData, setFormData] = useState({
     title: "",
+    subtitle: "",
+    description: "",
     image: "",
     link: "",
     active: true
@@ -149,8 +151,10 @@ export default function BannersPage() {
         <button 
           onClick={() => {
             setEditingBanner(null);
-            setFormData({ title: "", image: "", link: "", active: true });
+            setFormData({ title: "", subtitle: "", description: "", image: "", link: "", active: true });
             setIsAddingBanner(true);
+            setImagePreview("");
+            setImageFile(null);
           }}
           className="flex items-center gap-2 bg-brand text-white px-6 py-3 rounded-sm font-black uppercase tracking-widest text-[10px] hover:bg-brand-dark transition-all shadow-lg"
         >
@@ -192,6 +196,7 @@ export default function BannersPage() {
                 </td>
                 <td className="px-6 py-4">
                   <p className="font-bold text-brand-blue">{banner.title}</p>
+                  <p className="text-[10px] text-slate-400 line-clamp-1">{banner.subtitle}</p>
                   <div className="flex items-center gap-1 text-slate-400 mt-1">
                     <LinkIcon size={12} />
                     <span className="text-xs">{banner.link || "No link"}</span>
@@ -218,7 +223,14 @@ export default function BannersPage() {
                     <button 
                       onClick={() => {
                         setEditingBanner(banner);
-                        setFormData({ title: banner.title, image: banner.image, link: banner.link, active: banner.active });
+                        setFormData({ 
+                          title: banner.title, 
+                          subtitle: banner.subtitle || "", 
+                          description: banner.description || "", 
+                          image: banner.image, 
+                          link: banner.link, 
+                          active: banner.active 
+                        });
                         setIsAddingBanner(true);
                         setImagePreview(banner.image || "");
                         setImageFile(null);
@@ -252,6 +264,7 @@ export default function BannersPage() {
               <button 
                 onClick={() => {
                   setIsAddingBanner(false);
+                  setEditingBanner(null);
                   setImageFile(null);
                   setImagePreview("");
                 }} 
@@ -260,7 +273,7 @@ export default function BannersPage() {
                 <X size={20} />
               </button>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Banner Title</label>
                 <input 
@@ -269,6 +282,26 @@ export default function BannersPage() {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand transition-all text-sm font-medium" 
                   placeholder="e.g. Summer Sale" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Subtitle</label>
+                <input 
+                  type="text" 
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand transition-all text-sm font-medium" 
+                  placeholder="e.g. Up to 50% Off" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</label>
+                <textarea 
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-sm focus:outline-none focus:border-brand transition-all text-sm font-medium resize-none" 
+                  placeholder="Banner description..."
+                  rows="2"
                 />
               </div>
               
@@ -313,7 +346,7 @@ export default function BannersPage() {
                   placeholder="/products?sale=true" 
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pt-2">
                 <input 
                   type="checkbox" 
                   id="active"
