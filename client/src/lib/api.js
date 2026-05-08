@@ -145,6 +145,9 @@ export const fetchUserOrders = async (token, limit = 10, page = 1) => {
   }
 };
 
+export const fetchOrderById = (token, id) => 
+  apiRequest(`/orders/${id}`, { token });
+
 export const fetchBanners = async () => {
   try {
     return await apiRequest('/settings/banners');
