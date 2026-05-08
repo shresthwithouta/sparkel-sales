@@ -72,7 +72,7 @@ function LoginForm() {
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
               <div className="w-8 h-8 relative flex items-center justify-center transition-transform group-hover:scale-110">
-                <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" />
+                <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" sizes="32px" />
               </div>
               <span className="text-3xl font-black text-brand-blue uppercase tracking-tighter">
                 Spark <span className="text-brand">Innovations</span>

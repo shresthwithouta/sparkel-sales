@@ -68,6 +68,7 @@ export default function HeroSection() {
               fill 
               className="object-cover md:object-contain lg:object-cover object-center"
               priority
+              sizes="100vw"
             />
             {}
             <div className="absolute inset-0 bg-linear-to-r from-white via-white/20 md:via-white/40 to-transparent z-10" />
@@ -120,7 +121,7 @@ export default function HeroSection() {
       </div>
 
       {}
-      <div className="absolute right-10 bottom-10 flex gap-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:flex">
+      <div className="absolute right-10 bottom-10 gap-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:flex">
         <button 
           onClick={prevSlide}
           className="w-12 h-12 bg-white border border-slate-100 text-slate-900 flex items-center justify-center rounded-full hover:bg-brand hover:text-white transition-all"

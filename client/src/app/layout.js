@@ -25,6 +25,7 @@ const inter = Inter({
 });
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://sparkinnovations.com'),
   title: {
     default: `${SITE_CONFIG.name} | Authorized Kutchina Distributor`,
     template: `%s | ${SITE_CONFIG.name}`,

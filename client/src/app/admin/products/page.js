@@ -200,7 +200,7 @@ export default function AdminProductsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden p-1 shrink-0">
                           {product.images?.[0] ? (
-                            <Image src={product.images[0]} alt={product.name} fill className="object-contain" />
+                            <Image src={product.images[0]} alt={product.name} fill className="object-contain" sizes="80px" />
                           ) : (
                             <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
                               <Plus size={10} />
@@ -335,7 +335,7 @@ export default function AdminProductsPage() {
                 <div className="flex items-center gap-6">
                   <div className="w-24 h-24 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
                     {imagePreview || newProduct.images[0] ? (
-                      <Image src={imagePreview || newProduct.images[0]} alt="Preview" fill className="object-contain" />
+                      <Image src={imagePreview || newProduct.images[0]} alt="Preview" fill className="object-contain" sizes="80px" />
                     ) : (
                       <ImageIcon className="text-slate-200" size={32} />
                     )}

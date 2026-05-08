@@ -84,7 +84,7 @@ export default function CartPage() {
                   <div key={item.slug} className="p-4 md:p-6 flex flex-col md:grid md:grid-cols-5 gap-4 md:gap-6 items-center group">
                     <div className="w-full md:col-span-2 flex items-center gap-4 md:gap-6">
                       <div className="w-20 h-20 md:w-24 md:h-24 bg-white border border-slate-100 rounded-lg relative overflow-hidden p-2 shrink-0 group-hover:border-brand transition-colors shadow-sm">
-                        <Image src={item.images?.[0] || item.image || "/images/placeholder-product.svg"} alt={item.name} fill className="object-contain" />
+                        <Image src={item.images?.[0] || item.image || "/images/placeholder-product.svg"} alt={item.name} fill className="object-contain" sizes="(max-width: 768px) 20vw, 10vw" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/products/${item.slug}`} className="text-xs md:text-lg font-black text-brand-blue uppercase tracking-tight hover:text-brand transition-colors line-clamp-1 block">

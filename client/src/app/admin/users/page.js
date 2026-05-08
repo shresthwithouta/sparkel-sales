@@ -26,21 +26,38 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
-  useEffect(() => {
-    loadUsers();
-  }, [token]);
-
-  const loadUsers = async () => {
+  const loadUsers = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchUsers(token);
       setUsers(data.users || []);
     } catch (error) {
       console.error("Failed to load users:", error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const initLoad = async () => {
+      try {
+        const data = await fetchUsers(token);
+        if (isMounted) {
+          setUsers(data.users || []);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error("Failed to load users:", error);
+          setLoading(false);
+        }
+      }
+    };
+    
+    initLoad();
+    return () => { isMounted = false; };
+  }, [token]);
 
   const handleRoleToggle = async (userId, currentRole) => {
     const newRole = currentRole === "admin" ? "user" : "admin";

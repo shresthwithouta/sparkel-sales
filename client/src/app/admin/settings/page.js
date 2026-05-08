@@ -30,29 +30,52 @@ export default function SettingsPage() {
     }
   });
 
-  const loadSettings = async () => {
+  const loadSettings = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchSiteSettings();
       if (data.settings) {
-        setSettings({
-          ...settings,
+        setSettings(prev => ({
+          ...prev,
           ...data.settings,
           social: {
-            ...settings.social,
+            ...prev.social,
             ...(data.settings.social || {})
           }
-        });
+        }));
       }
     } catch (err) {
       console.error("Error loading settings:", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadSettings();
+    let isMounted = true;
+    const initSettings = async () => {
+      try {
+        const data = await fetchSiteSettings();
+        if (isMounted && data.settings) {
+          setSettings(prev => ({
+            ...prev,
+            ...data.settings,
+            social: {
+              ...prev.social,
+              ...(data.settings.social || {})
+            }
+          }));
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error loading settings:", err);
+          setLoading(false);
+        }
+      }
+    };
+    initSettings();
+    return () => { isMounted = false; };
   }, []);
 
   const handleSaveSettings = async () => {

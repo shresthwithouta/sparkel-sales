@@ -147,7 +147,7 @@ export default function AdminLayout({ children }) {
               </div>
               <div className="w-8 h-8 md:w-10 md:h-10 bg-brand rounded-full border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-white shrink-0 relative">
                 {user?.avatar ? (
-                  <Image src={user.avatar} alt="Admin" fill className="object-cover" />
+                  <Image src={user.avatar} alt="User" fill className="object-cover" sizes="32px" />
                 ) : (
                   <LayoutDashboard size={16} />
                 )}

@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }
     loadUser()
-  }, [])
+  }, [clearAuth])
 
   const login = (token, userData) => {
     setToken(token);

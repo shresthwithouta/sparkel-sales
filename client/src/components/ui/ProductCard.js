@@ -9,6 +9,8 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProductCard({ product }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
@@ -20,9 +22,6 @@ export default function ProductCard({ product }) {
     e.stopPropagation();
     addToCart(product);
   };
-
-  const router = useRouter();
-  const pathname = usePathname();
 
   const handleWishlistClick = (e) => {
     e.preventDefault();
@@ -42,6 +41,7 @@ export default function ProductCard({ product }) {
           alt={product.name} 
           fill 
           className="object-contain p-4 md:p-6 group-hover:scale-110 transition-transform duration-700" 
+          sizes="(max-width: 1023px) 50vw, 25vw"
         />
         {}
         <div className="absolute top-2 right-2 md:top-4 md:right-4 flex flex-col gap-2 z-10">

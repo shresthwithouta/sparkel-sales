@@ -80,7 +80,7 @@ export function WishlistProvider({ children }) {
     }
     // Also clear guest storage
     localStorage.removeItem("wishlist_guest");
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, showToast]);
 
   const value = useMemo(() => ({
     wishlistItems,

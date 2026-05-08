@@ -52,6 +52,7 @@ export default function ProductMarquee() {
                   alt={product.name} 
                   fill 
                   className="object-contain p-2"
+                  sizes="96px"
                 />
               </div>
               
@@ -72,7 +73,7 @@ export default function ProductMarquee() {
               </div>
             </div>
 
-            <div className="h-12 w-[1px] bg-slate-200 mx-8 opacity-50"></div>
+            <div className="h-12 w-px bg-slate-200 mx-8 opacity-50"></div>
           </Link>
         ))}
       </div>

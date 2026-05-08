@@ -29,21 +29,38 @@ export default function AdminOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const loadOrders = async () => {
+  const loadOrders = async (showLoading = true) => {
     if (!token) return;
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchAllOrders(token);
       setOrders(data.orders || []);
     } catch (err) {
       console.error("Failed to fetch orders", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadOrders();
+    let isMounted = true;
+    const initOrders = async () => {
+      if (!token) return;
+      try {
+        const data = await fetchAllOrders(token);
+        if (isMounted) {
+          setOrders(data.orders || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Failed to fetch orders", err);
+          setLoading(false);
+        }
+      }
+    };
+    initOrders();
+    return () => { isMounted = false; };
   }, [token]);
 
   const handleUpdateStatus = async (id, status) => {
@@ -225,7 +242,7 @@ export default function AdminOrdersPage() {
                   {selectedOrder.items?.map((item, idx) => (
                     <div key={idx} className="flex gap-4 p-3 bg-slate-50 rounded-sm border border-slate-100">
                       <div className="w-14 h-14 bg-white rounded-sm overflow-hidden border border-slate-200 relative shrink-0">
-                        <Image src={item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" />
+                        <Image src={item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" sizes="48px" />
                       </div>
                       <div className="flex-1">
                         <p className="text-[10px] font-black text-brand-blue uppercase leading-tight">{item.name}</p>

@@ -31,11 +31,13 @@ export default function AdminDashboard() {
   const { token } = useAuth();
   const { showToast } = useToast();
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (showLoading = true) => {
     if (!token) return;
     try {
-      setLoading(true);
-      setError(null);
+      if (showLoading) {
+        setLoading(true);
+        setError(null);
+      }
       const [statsData, inquiriesData] = await Promise.all([
         fetchStats(token),
         fetchInquiries(token)
@@ -75,15 +77,70 @@ export default function AdminDashboard() {
       setRecentInquiries((inquiriesData.inquiries || []).slice(0, 5));
     } catch (err) {
       console.error("Error loading dashboard data:", err);
-      setError("Failed to load dashboard statistics. Please try refreshing the page.");
-      showToast("Failed to load stats", "error");
+      if (showLoading) {
+        setError("Failed to load dashboard statistics. Please try refreshing the page.");
+        showToast("Failed to load stats", "error");
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDashboardData();
+    let isMounted = true;
+    const initDashboard = async () => {
+      if (!token) return;
+      try {
+        const [statsData, inquiriesData] = await Promise.all([
+          fetchStats(token),
+          fetchInquiries(token)
+        ]);
+
+        if (isMounted) {
+          const liveStats = [
+            { 
+              label: "Total Products", 
+              value: statsData.products?.total || "0", 
+              icon: <Package size={24} />, 
+              color: "bg-blue-500",
+              trend: `${statsData.products?.inStock || 0} In Stock`
+            },
+            { 
+              label: "New Inquiries", 
+              value: statsData.inquiries?.byStatus?.New || "0", 
+              icon: <MessageSquare size={24} />, 
+              color: "bg-brand",
+              trend: `${statsData.inquiries?.total || 0} Total`
+            },
+            { 
+              label: "Active Banners", 
+              value: statsData.banners?.active || "0", 
+              icon: <Eye size={24} />, 
+              color: "bg-indigo-500",
+              trend: "Live"
+            },
+            { 
+              label: "Total Users", 
+              value: statsData.users?.total || "0", 
+              icon: <Users size={24} />, 
+              color: "bg-slate-800",
+              trend: "Registered"
+            },
+          ];
+          setStats(liveStats);
+          setRecentInquiries((inquiriesData.inquiries || []).slice(0, 5));
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error loading dashboard data:", err);
+          setError("Failed to load dashboard statistics.");
+          setLoading(false);
+        }
+      }
+    };
+    initDashboard();
+    return () => { isMounted = false; };
   }, [token]);
 
   return (

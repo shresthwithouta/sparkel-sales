@@ -26,18 +26,34 @@ export default function BannersPage() {
   const [imagePreview, setImagePreview] = useState("");
 
   useEffect(() => {
-    loadBanners();
+    let isMounted = true;
+    const initBanners = async () => {
+      try {
+        const data = await fetchBanners();
+        if (isMounted) {
+          setBanners(data.banners || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error loading banners:", err);
+          setLoading(false);
+        }
+      }
+    };
+    initBanners();
+    return () => { isMounted = false; };
   }, []);
 
-  const loadBanners = async () => {
+  const loadBanners = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchBanners();
       setBanners(data.banners || []);
     } catch (err) {
       console.error("Error loading banners:", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -163,7 +179,7 @@ export default function BannersPage() {
                 <td className="px-6 py-4 w-64">
                   <div className="aspect-[3/1] bg-slate-100 rounded-sm border border-slate-200 flex items-center justify-center relative overflow-hidden group">
                     {banner.image ? (
-                      <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                      <Image src={banner.image} alt={banner.title} fill className="object-cover" sizes="100vw" />
                     ) : (
                       <ImageIcon size={24} className="text-slate-300" />
                     )}
@@ -259,7 +275,7 @@ export default function BannersPage() {
                 <div className="flex items-center gap-6">
                   <div className="w-32 h-16 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
                     {imagePreview || formData.image ? (
-                      <Image src={imagePreview || formData.image} alt="Preview" fill className="object-cover" />
+                      <Image src={imagePreview || formData.image} alt="Preview" fill className="object-cover" sizes="100vw" />
                     ) : (
                       <ImageIcon className="text-slate-200" size={24} />
                     )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/api";
@@ -20,7 +20,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
@@ -51,9 +50,11 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, authLoading, router, showToast]);
 
+  const hasInitialized = useRef(false);
+
   // Autofill form when user data is available, but don't overwrite manual edits
   useEffect(() => {
-    if (user) {
+    if (user && !hasInitialized.current) {
       setFormData(prev => ({
         ...prev,
         name: prev.name || user.name || "",
@@ -65,6 +66,7 @@ export default function CheckoutPage() {
         zipCode: prev.zipCode || user.address?.zipCode || "",
         country: prev.country || user.address?.country || "India"
       }));
+      hasInitialized.current = true;
     }
   }, [user]);
 
@@ -302,12 +304,13 @@ export default function CheckoutPage() {
                     <h3 className="text-2xl font-black text-brand-blue uppercase">₹{cartTotal.toLocaleString("en-IN")}</h3>
                   </div>
                   <div className="relative w-64 h-64 border-8 border-slate-50 rounded-lg overflow-hidden shadow-2xl mb-8">
-                    <Image 
-                      src="/images/upi-qr-placeholder.png" 
-                      alt="UPI QR Code" 
-                      fill 
-                      className="object-cover"
-                    />
+                      <Image 
+                        src="/images/upi-qr-placeholder.png" 
+                        alt="UPI QR Code" 
+                        fill 
+                        className="object-cover"
+                        sizes="256px"
+                      />
                   </div>
                   <div className="flex items-center gap-3 text-slate-400 bg-slate-50 px-6 py-3 rounded-full border border-slate-100">
                     <Smartphone size={16} />
@@ -326,7 +329,7 @@ export default function CheckoutPage() {
               {cartItems.map((item) => (
                 <div key={item.slug} className="flex gap-4">
                   <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden shrink-0">
-                    <Image src={item.images?.[0] || item.image} alt={item.name} fill className="object-contain" />
+                    <Image src={item.images?.[0] || item.image} alt={item.name} fill className="object-contain" sizes="48px" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] font-black text-brand-blue uppercase leading-tight mb-1 line-clamp-1">{item.name}</p>

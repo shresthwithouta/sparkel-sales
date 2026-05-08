@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-10 group cursor-default">
               <div className="w-10 h-10 relative flex items-center justify-center">
-                <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" />
+                <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" sizes="40px" />
               </div>
               <span className="text-2xl font-black uppercase tracking-tighter">
                 Spark <span className="text-brand">Innovations</span>

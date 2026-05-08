@@ -78,7 +78,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-7 h-7 relative flex items-center justify-center">
-              <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" />
+              <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" sizes="32px" />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black uppercase tracking-tighter">
@@ -167,7 +167,7 @@ export default function Navbar() {
                             {cartItems.map((item) => (
                               <div key={item.slug} className="flex gap-4">
                                 <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-sm relative overflow-hidden shrink-0">
-                                  <Image src={item.images?.[0] || item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" />
+                                  <Image src={item.images?.[0] || item.image || "/images/placeholder.png"} alt={item.name} fill className="object-contain" sizes="48px" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[10px] font-black text-brand-blue uppercase leading-tight truncate mb-1">{item.name}</p>
@@ -211,7 +211,7 @@ export default function Navbar() {
               <Link href="/me" className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-brand-dark flex items-center justify-center bg-brand text-white relative">
                   {user?.avatar ? (
-                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                    <Image src={user.avatar} alt={user.name} fill className="object-cover" sizes="48px" />
                   ) : (
                     <User size={14} />
                   )}

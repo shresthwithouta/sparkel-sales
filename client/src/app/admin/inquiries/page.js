@@ -26,21 +26,38 @@ export default function AdminInquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const loadInquiries = async () => {
+  const loadInquiries = async (showLoading = true) => {
     if (!token) return;
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchInquiries(token);
       setInquiries(data.inquiries || []);
     } catch (err) {
       console.error("Failed to fetch inquiries", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadInquiries();
+    let isMounted = true;
+    const initInquiries = async () => {
+      if (!token) return;
+      try {
+        const data = await fetchInquiries(token);
+        if (isMounted) {
+          setInquiries(data.inquiries || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Failed to fetch inquiries", err);
+          setLoading(false);
+        }
+      }
+    };
+    initInquiries();
+    return () => { isMounted = false; };
   }, [token]);
 
   const handleDelete = async (id) => {

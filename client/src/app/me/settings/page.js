@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { updateUserProfile, uploadImage } from '@/lib/api'
-import { ChevronLeft, Save, AlertCircle, CheckCircle, Camera, Loader2 } from 'lucide-react'
+import { updateUserProfile, uploadImage, updatePassword as updatePasswordApi } from '@/lib/api'
+import { ChevronLeft, Save, AlertCircle, CheckCircle, Camera, Loader2, Lock } from 'lucide-react'
 
 export default function UserSettings() {
   const { user, loading, isAuthenticated } = useAuth()
@@ -87,6 +87,31 @@ function SettingsForm({ user }) {
     country: user.address?.country || ''
   })
 
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault()
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' })
+      return
+    }
+    
+    setIsChangingPassword(true)
+    try {
+      await updatePasswordApi(token, {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      })
+      setMessage({ type: 'success', text: 'Password updated successfully!' })
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || 'Failed to update password' })
+    } finally {
+      setIsChangingPassword(false)
+    }
+  }
+
   const handleAddressChange = (e) => {
     const { name, value } = e.target
     setAddressData(prev => ({ ...prev, [name]: value }))
@@ -147,7 +172,7 @@ function SettingsForm({ user }) {
             <div className="relative group">
               <div className="w-24 h-24 bg-slate-100 rounded-full overflow-hidden border-2 border-slate-200 flex items-center justify-center relative">
                 {avatarPreview ? (
-                  <Image src={avatarPreview} alt="Avatar" fill className="object-cover" />
+                  <Image src={avatarPreview} alt="Avatar" fill className="object-cover" sizes="80px" />
                 ) : (
                   <Camera size={32} className="text-slate-300" />
                 )}
@@ -293,6 +318,57 @@ function SettingsForm({ user }) {
             >
               <Save size={18} />
               {isSaving ? 'Saving...' : 'Save Address'}
+            </button>
+          </form>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-12">
+          <h2 className="text-xl font-bold text-brand-blue mb-6">Security</h2>
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Current Password</label>
+              <input
+                type="password"
+                required
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isChangingPassword}
+              className="flex items-center gap-2 px-6 py-2 bg-slate-900 text-white rounded-lg font-semibold hover:bg-black transition disabled:opacity-50"
+            >
+              <Lock size={18} />
+              {isChangingPassword ? 'Updating...' : 'Update Password'}
             </button>
           </form>
         </div>

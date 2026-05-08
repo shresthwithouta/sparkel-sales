@@ -86,12 +86,13 @@ export default function ProductDetailPage({ params }) {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
           <div className="space-y-4">
             <div className="relative aspect-square bg-white border border-slate-200 rounded-sm overflow-hidden p-8 md:p-16">
-              <Image
-                src={product.images?.[0] || "/images/placeholder-product.svg"}
-                alt={product.name}
-                fill
-                className="object-contain"
-              />
+                <Image
+                  src={product.images?.[0] || "/images/placeholder-product.svg"}
+                  alt={product.name}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
             </div>
             <div className="grid grid-cols-4 gap-4">
               {product.images?.map((img, i) => (

@@ -110,7 +110,7 @@ export default function UserDashboard() {
               <div className="bg-gradient-to-br from-brand to-brand-dark p-6 text-white text-center">
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center overflow-hidden border-2 border-white/30 relative mx-auto mb-3">
                   {user?.avatar ? (
-                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                    <Image src={user.avatar} alt={user.name} fill className="object-cover" sizes="80px" />
                   ) : (
                     <User size={40} className="text-white" />
                   )}
@@ -319,7 +319,7 @@ export default function UserDashboard() {
                             <div className="flex flex-wrap gap-4">
                               {order.items?.slice(0, 4).map((item, idx) => (
                                 <div key={idx} className="w-16 h-16 bg-white border border-slate-100 rounded-sm p-1 relative group-hover:border-brand/20 transition-colors">
-                                  <Image src={item.image || '/images/placeholder.png'} alt={item.name} fill className="object-contain p-1" />
+                                  <Image src={item.image || '/images/placeholder.png'} alt={item.name} fill className="object-contain p-1" sizes="64px" />
                                 </div>
                               ))}
                               {order.items?.length > 4 && (

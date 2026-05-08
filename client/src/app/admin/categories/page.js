@@ -36,21 +36,35 @@ export default function AdminCategoriesPage() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
 
-  const loadCategories = async (isMounted = true) => {
+  const loadCategories = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await fetchCategories();
-      if (isMounted) setCategories(data.categories || []);
+      setCategories(data.categories || []);
     } catch (err) {
       console.error("Error loading categories:", err);
     } finally {
-      if (isMounted) setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
     let isMounted = true;
-    loadCategories(isMounted);
+    const initCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        if (isMounted) {
+          setCategories(data.categories || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error loading categories:", err);
+          setLoading(false);
+        }
+      }
+    };
+    initCategories();
     return () => { isMounted = false; };
   }, []);
 
@@ -255,7 +269,7 @@ export default function AdminCategoriesPage() {
                 <div className="flex items-center gap-6">
                   <div className="w-20 h-20 bg-slate-50 border border-slate-200 rounded-sm overflow-hidden flex items-center justify-center relative">
                     {imagePreview || newCategory.image ? (
-                      <Image src={imagePreview || newCategory.image} alt="Preview" fill className="object-contain" />
+                      <Image src={imagePreview || newCategory.image} alt="Preview" fill className="object-contain" sizes="100vw" />
                     ) : (
                       <ImageIconLucide className="text-slate-200" size={24} />
                     )}

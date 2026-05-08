@@ -83,11 +83,11 @@ export default function OrderHistory() {
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="flex items-center gap-2 text-slate-600">
                         <Calendar size={16} />
-                        <span>{order.date}</span>
+                        <span>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : order.date}</span>
                       </div>
                       <div className="flex items-center gap-2 text-slate-600">
                         <ShoppingBag size={16} />
-                        <span>{order.items} items</span>
+                        <span>{Array.isArray(order.items) ? order.items.length : (order.items || 0)} items</span>
                       </div>
                       <div className="flex items-center gap-2 text-brand font-bold">
                         <DollarSign size={16} />

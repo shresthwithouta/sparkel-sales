@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { createInquiry } from "@/lib/api";
 import { Mail, MapPin, Phone, Send, MessageSquare } from "lucide-react";
 
 export default function ContactPage() {
@@ -20,8 +21,12 @@ export default function ContactPage() {
     setStatus({ loading: true, success: false, error: null });
 
     try {
-      // Simulate API call or actually call createInquiry if we want
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await createInquiry({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: `${formData.subject ? `[${formData.subject}] ` : ""}${formData.message}`
+      });
       setStatus({ loading: false, success: true, error: null });
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       

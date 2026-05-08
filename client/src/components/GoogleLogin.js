@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
 export default function GoogleLoginComponent() {
   return (
-    <Suspense fallback={<div className="h-[44px] w-full bg-slate-100 animate-pulse rounded-lg" />}>
+    <Suspense fallback={<div className="h-11 w-full bg-slate-100 animate-pulse rounded-lg" />}>
       <GoogleLoginInner />
     </Suspense>
   )
@@ -24,6 +24,21 @@ function GoogleLoginInner() {
 
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
+  const handleCredentialResponse = useCallback(async (response) => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      await googleLogin(response.credential)
+      router.push(redirect)
+    } catch (err) {
+      console.error('Google login error:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [googleLogin, router, redirect])
+
   useEffect(() => {
     if (!clientId) return
 
@@ -34,16 +49,19 @@ function GoogleLoginInner() {
     script.defer = true
     script.onload = () => {
       if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleCredentialResponse,
-        })
+        if (!window.google_initialized) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleCredentialResponse,
+          })
+          window.google_initialized = true;
+        }
         window.google.accounts.id.renderButton(
           document.getElementById('google-signin-btn'),
           {
             theme: 'outline',
             size: 'large',
-            width: '100%',
+            width: '350',
             text: 'continue_with',
             shape: 'rectangular',
           }
@@ -60,22 +78,7 @@ function GoogleLoginInner() {
         existingScript.remove()
       }
     }
-  }, [clientId])
-
-  const handleCredentialResponse = async (response) => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      await googleLogin(response.credential)
-      router.push(redirect)
-    } catch (err) {
-      console.error('Google login error:', err)
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [clientId, handleCredentialResponse])
 
   if (!clientId) {
     return (
@@ -92,7 +95,7 @@ function GoogleLoginInner() {
       {error && <p className="text-red-500 text-xs font-bold uppercase tracking-widest">{error}</p>}
       <div id="google-signin-btn" className="w-full flex justify-center"></div>
       {!googleReady && (
-        <div className="h-[44px] w-full bg-slate-50 border border-slate-100 rounded-lg animate-pulse flex items-center justify-center">
+        <div className="h-11 w-full bg-slate-50 border border-slate-100 rounded-lg animate-pulse flex items-center justify-center">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Loading Google...</p>
         </div>
       )}

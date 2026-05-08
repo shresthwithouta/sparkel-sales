@@ -238,4 +238,11 @@ export const fetchUsers = (token) =>
 export const updateAdminUser = (token, id, data) => 
   apiRequest(`/admin/users/${id}`, { method: 'PATCH', token, body: JSON.stringify(data) });
 
+export const updateProfile = (token, profileData) => 
+  apiRequest('/auth/profile', { method: 'PUT', token, body: JSON.stringify(profileData) });
 
+export const updatePassword = (token, passwordData) => 
+  apiRequest('/auth/password', { method: 'PUT', token, body: JSON.stringify(passwordData) });
+
+export const applyForJob = (jobData) => 
+  apiRequest('/jobs/apply', { method: 'POST', body: JSON.stringify(jobData) });

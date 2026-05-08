@@ -124,7 +124,7 @@ export function CartProvider({ children }) {
     }
     // Also clear guest storage
     localStorage.removeItem("cart_guest");
-  }, [isAuthenticated, token, syncCart]);
+  }, [isAuthenticated, token, syncCart, showToast]);
 
   const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
