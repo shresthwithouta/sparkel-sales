@@ -232,7 +232,7 @@ export const uploadImage = (token, formData) => {
     if (file.size > 5 * 1024 * 1024) throw new Error("File size exceeds 5MB limit");
     if (!file.type.startsWith('image/')) throw new Error("Only image files are allowed");
   }
-  return apiRequest('/upload', { method: 'POST', body: formData });
+  return apiRequest('/upload', { method: 'POST', token, body: formData });
 };
 
 export const fetchUsers = (token) => 
