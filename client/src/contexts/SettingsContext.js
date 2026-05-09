@@ -6,7 +6,14 @@ import { fetchSiteSettings } from "@/lib/api";
 const SettingsContext = createContext();
 
 export function SettingsProvider({ children }) {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState(() => {
+    // Try to load from localStorage on initial render
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("site_settings");
+      return saved ? JSON.parse(saved) : null;
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
 
   const loadSettings = async () => {
@@ -14,6 +21,8 @@ export function SettingsProvider({ children }) {
       const data = await fetchSiteSettings();
       if (data && data.settings) {
         setSettings(data.settings);
+        // Cache the latest "truth"
+        localStorage.setItem("site_settings", JSON.stringify(data.settings));
       }
     } catch (error) {
       console.error("Error loading site settings:", error);
