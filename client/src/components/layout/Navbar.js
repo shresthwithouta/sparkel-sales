@@ -11,6 +11,8 @@ import { useWishlist } from "@/contexts/WishlistContext";
 
 import { usePathname, useRouter } from "next/navigation";
 import { fetchCategories } from "@/lib/api";
+import TopBar from "./TopBar";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -18,6 +20,7 @@ export default function Navbar() {
   const { cartCount, cartItems } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAuthenticated, logout } = useAuth();
+  const { settings } = useSettings();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
@@ -71,18 +74,31 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-        isScrolled ? "py-2 shadow-sm" : "py-3 md:py-4"
+        isScrolled ? "shadow-sm" : ""
       } border-b border-slate-50`}
     >
-      <div className="container-wide">
+      <TopBar />
+      <div className={`container-wide transition-all duration-300 ${isScrolled ? "py-2" : "py-3 md:py-4"}`}>
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-7 h-7 relative flex items-center justify-center">
-              <Image src="/favicon.ico" alt="Spark Innovations Logo" fill className="object-contain" sizes="32px" />
+              <Image 
+                src={settings?.logo || "/favicon.ico"} 
+                alt={`${settings?.websiteName || "Spark Innovations"} Logo`} 
+                fill 
+                className="object-contain" 
+                sizes="32px" 
+              />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black uppercase tracking-tighter">
-                Spark <span className="text-brand">Innovations</span>
+                {settings?.websiteName ? (
+                  <>
+                    {settings.websiteName.split(' ')[0]} <span className="text-brand">{settings.websiteName.split(' ').slice(1).join(' ')}</span>
+                  </>
+                ) : (
+                  <>Spark <span className="text-brand">Innovations</span></>
+                )}
               </span>
             </div>
           </Link>

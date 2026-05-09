@@ -89,7 +89,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <main className="min-h-screen pt-24 pb-20">
+    <main className="min-h-screen pt-32 md:pt-40 pb-20">
       <div className="container-wide">
         <SectionHeader 
           badge="Product Catalogue"

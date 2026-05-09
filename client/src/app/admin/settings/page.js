@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, LayoutTemplate, Type, Phone, Share2, Loader2 } from "lucide-react";
-import { fetchSiteSettings, updateSiteSettings } from "@/lib/api";
+import { Save, LayoutTemplate, Type, Phone, Share2, Loader2, Upload, Trash2, Globe } from "lucide-react";
+import { fetchSiteSettings, updateSiteSettings, uploadImage } from "@/lib/api";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
@@ -12,6 +14,7 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { token } = useAuth();
   const { showToast } = useToast();
+  const { refreshSettings } = useSettings();
 
   const [settings, setSettings] = useState({
     websiteName: "",
@@ -22,11 +25,15 @@ export default function SettingsPage() {
     email: "",
     address: "",
     mapsUrl: "",
+    logo: "",
+    favicon: "",
+    topBarText: "",
     social: {
       facebook: "",
       instagram: "",
       twitter: "",
-      youtube: ""
+      youtube: "",
+      linkedin: ""
     }
   });
 
@@ -52,37 +59,41 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    let isMounted = true;
-    const initSettings = async () => {
-      try {
-        const data = await fetchSiteSettings();
-        if (isMounted && data.settings) {
-          setSettings(prev => ({
-            ...prev,
-            ...data.settings,
-            social: {
-              ...prev.social,
-              ...(data.settings.social || {})
-            }
-          }));
-          setLoading(false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("Error loading settings:", err);
-          setLoading(false);
-        }
-      }
+    const init = async () => {
+      // Pass false to avoid synchronous setLoading(true) which triggers lint error
+      await loadSettings(false);
+      setLoading(false);
     };
-    initSettings();
-    return () => { isMounted = false; };
+    init();
   }, []);
+
+  const handleImageUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      
+      showToast(`Uploading ${type}...`, "info");
+      const res = await uploadImage(token, formData);
+      
+      if (res.url) {
+        setSettings(prev => ({ ...prev, [type]: res.url }));
+        showToast(`${type} uploaded successfully!`, "success");
+      }
+    } catch (err) {
+      console.error(`Error uploading ${type}:`, err);
+      showToast(err.message || `Failed to upload ${type}`, "error");
+    }
+  };
 
   const handleSaveSettings = async () => {
     try {
       setIsSaving(true);
       await updateSiteSettings(token, settings);
       showToast("Settings saved successfully!", "success");
+      refreshSettings();
     } catch (err) {
       console.error("Error saving settings:", err);
       showToast(err.message || "Failed to save settings", "error");
@@ -159,6 +170,16 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Top Bar Announcement Text</label>
+                    <input 
+                      type="text" 
+                      value={settings.topBarText}
+                      onChange={(e) => setSettings({ ...settings, topBarText: e.target.value })}
+                      placeholder="Under Spark Innovations"
+                      className="w-full border border-slate-200 rounded-sm px-4 py-3 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" 
+                    />
+                  </div>
+                  <div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Meta Description (SEO)</label>
                     <textarea 
                       value={settings.metaDescription}
@@ -167,19 +188,60 @@ export default function SettingsPage() {
                       className="w-full border border-slate-200 rounded-sm px-4 py-3 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all resize-none"
                     ></textarea>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Logo Upload</label>
-                       <div className="border-2 border-dashed border-slate-200 rounded-sm p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand transition-colors bg-slate-50">
-                         <LayoutTemplate size={24} className="text-slate-300 mb-2" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Click to replace</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Website Logo</label>
+                       <div className="relative group">
+                         <div className="border-2 border-dashed border-slate-200 rounded-sm p-4 flex flex-col items-center justify-center text-center bg-slate-50 min-h-40 transition-all group-hover:border-brand">
+                           {settings.logo ? (
+                             <div className="relative w-full aspect-video mb-4">
+                               <Image src={settings.logo} alt="Logo Preview" fill className="object-contain" />
+                               <button 
+                                 onClick={() => setSettings({ ...settings, logo: "" })}
+                                 className="absolute -top-2 -right-2 p-1.5 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                               >
+                                 <Trash2 size={12} />
+                               </button>
+                             </div>
+                           ) : (
+                             <div className="flex flex-col items-center">
+                               <Upload size={24} className="text-slate-300 mb-2" />
+                               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">No Logo Set</span>
+                             </div>
+                           )}
+                           <label className="mt-2 px-4 py-2 bg-white border border-slate-200 rounded-sm text-[9px] font-black uppercase tracking-widest text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+                             {settings.logo ? "Replace Logo" : "Upload Logo"}
+                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, "logo")} />
+                           </label>
+                         </div>
                        </div>
                     </div>
-                    <div>
-                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Favicon Upload</label>
-                       <div className="border-2 border-dashed border-slate-200 rounded-sm p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand transition-colors bg-slate-50">
-                         <LayoutTemplate size={24} className="text-slate-300 mb-2" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Click to replace</span>
+
+                    <div className="space-y-3">
+                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Favicon (Browser Icon)</label>
+                       <div className="relative group">
+                         <div className="border-2 border-dashed border-slate-200 rounded-sm p-4 flex flex-col items-center justify-center text-center bg-slate-50 min-h-40 transition-all group-hover:border-brand">
+                           {settings.favicon ? (
+                             <div className="relative w-16 h-16 mb-4">
+                               <Image src={settings.favicon} alt="Favicon Preview" fill className="object-contain" />
+                               <button 
+                                 onClick={() => setSettings({ ...settings, favicon: "" })}
+                                 className="absolute -top-2 -right-2 p-1.5 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                               >
+                                 <Trash2 size={12} />
+                               </button>
+                             </div>
+                           ) : (
+                             <div className="flex flex-col items-center">
+                               <Globe size={24} className="text-slate-300 mb-2" />
+                               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">No Favicon Set</span>
+                             </div>
+                           )}
+                           <label className="mt-2 px-4 py-2 bg-white border border-slate-200 rounded-sm text-[9px] font-black uppercase tracking-widest text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+                             {settings.favicon ? "Replace Favicon" : "Upload Favicon"}
+                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, "favicon")} />
+                           </label>
+                         </div>
                        </div>
                     </div>
                   </div>
@@ -279,7 +341,7 @@ export default function SettingsPage() {
                 <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 pb-4 border-b border-slate-100">Social Media Links</h3>
                 
                 <div className="space-y-4">
-                  {['Facebook', 'Instagram', 'Twitter', 'YouTube'].map(social => (
+                  {['Facebook', 'Instagram', 'Twitter', 'YouTube', 'LinkedIn'].map(social => (
                     <div key={social}>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{social} URL</label>
                       <input 

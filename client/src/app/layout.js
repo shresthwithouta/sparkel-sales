@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 import { ToastProvider } from "@/contexts/ToastContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import { SITE_CONFIG } from "@/lib/constants";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -70,20 +71,22 @@ export default function RootLayout({ children }) {
       <body className="font-inter">
         <ErrorBoundary>
           <ToastProvider>
-            <AuthProvider>
-              <GoogleAuthProvider>
-                <CartProvider>
-                  <WishlistProvider>
-                    <SmoothScroll>
-                      <Navbar />
-                      <main>{children}</main>
-                      <Footer />
-                      <WhatsAppFloat />
-                    </SmoothScroll>
-                  </WishlistProvider>
-                </CartProvider>
-              </GoogleAuthProvider>
-            </AuthProvider>
+            <SettingsProvider>
+              <AuthProvider>
+                <GoogleAuthProvider>
+                  <CartProvider>
+                    <WishlistProvider>
+                      <SmoothScroll>
+                        <Navbar />
+                        <main>{children}</main>
+                        <Footer />
+                        <WhatsAppFloat />
+                      </SmoothScroll>
+                    </WishlistProvider>
+                  </CartProvider>
+                </GoogleAuthProvider>
+              </AuthProvider>
+            </SettingsProvider>
           </ToastProvider>
         </ErrorBoundary>
       </body>

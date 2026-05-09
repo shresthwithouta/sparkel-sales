@@ -99,7 +99,7 @@ export default function HeroSection() {
   const slide = banners[currentSlide] || HERO_SLIDES[0];
 
   return (
-    <section className="relative w-full h-[50vh] md:h-[85vh] bg-white overflow-hidden group pt-14 md:pt-20">
+    <section className="relative w-full h-[60vh] md:h-[85vh] bg-white overflow-hidden group pt-24 md:pt-32">
       <div className="absolute inset-0 z-0">
         {banners.map((s, idx) => (
           <div 
