@@ -13,18 +13,17 @@ export default function ProductSlider() {
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef(null);
   const animationRef = useRef(null);
-  const offsetRef = useRef(0);
 
   useEffect(() => {
     const getProducts = async () => {
       try {
         const data = await fetchProducts({ limit: 10 });
         const list = data?.products?.length > 0 ? data.products : SAMPLE_PRODUCTS;
-        // Tripling the products ensures we always have enough for a seamless loop on any screen size
-        setProducts([...list, ...list, ...list]);
+        // Double the products for a seamless loop
+        setProducts([...list, ...list]);
       } catch (error) {
         console.error("Error fetching products for slider:", error);
-        setProducts([...SAMPLE_PRODUCTS, ...SAMPLE_PRODUCTS, ...SAMPLE_PRODUCTS]);
+        setProducts([...SAMPLE_PRODUCTS, ...SAMPLE_PRODUCTS]);
       } finally {
         setLoading(false);
       }
@@ -33,7 +32,7 @@ export default function ProductSlider() {
     getProducts();
   }, []);
 
-  // Butter-Smooth Sub-pixel Scrolling using requestAnimationFrame
+  // Smooth Auto-Scrolling using scrollLeft (allows manual scroll)
   useEffect(() => {
     if (loading || !scrollRef.current) return;
 
@@ -41,17 +40,13 @@ export default function ProductSlider() {
     
     const animate = () => {
       if (!isPaused) {
-        // Speed control: 1.2px per frame (approx 72px/sec at 60fps)
-        offsetRef.current += 1.2;
+        // Increment scrollLeft slightly every frame
+        scrollContainer.scrollLeft += 0.8;
         
-        const scrollWidth = scrollContainer.scrollWidth / 3;
-        
-        // Seamless Loop Logic
-        if (offsetRef.current >= scrollWidth) {
-          offsetRef.current = 0;
+        // Loop logic
+        if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+          scrollContainer.scrollLeft = 0;
         }
-        
-        scrollContainer.style.transform = `translateX(-${offsetRef.current}px)`;
       }
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -80,14 +75,14 @@ export default function ProductSlider() {
         </div>
 
         <div 
-          className="relative group cursor-grab active:cursor-grabbing"
+          className="relative group"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Inner Rail for smooth translation */}
           <div 
             ref={scrollRef}
-            className="flex gap-6 md:gap-8 will-change-transform py-4"
+            className="flex gap-6 md:gap-8 overflow-x-auto pb-8 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {loading ? (
               [...Array(6)].map((_, i) => (
@@ -97,7 +92,7 @@ export default function ProductSlider() {
               products.map((product, idx) => (
                 <div 
                   key={`${product._id || product.slug}-${idx}`} 
-                  className="min-w-[280px] md:min-w-[320px] shrink-0 transition-transform duration-500 hover:scale-105 hover:z-20"
+                  className="min-w-[280px] md:min-w-[320px] shrink-0 transition-all duration-500 hover:scale-[1.03] hover:z-20"
                 >
                   <ProductCard product={product} />
                 </div>
@@ -105,9 +100,9 @@ export default function ProductSlider() {
             )}
           </div>
           
-          {/* Side Gradients for Premium Feel */}
-          <div className="absolute top-0 left-0 h-full w-24 bg-linear-to-r from-slate-50/50 to-transparent pointer-events-none z-10" />
-          <div className="absolute top-0 right-0 h-full w-24 bg-linear-to-l from-slate-50/50 to-transparent pointer-events-none z-10" />
+          {/* Side Gradients (Removed on small mobile to avoid "white box" issues) */}
+          <div className="hidden md:block absolute top-0 left-0 h-full w-24 bg-linear-to-r from-slate-50/50 to-transparent pointer-events-none z-10" />
+          <div className="hidden md:block absolute top-0 right-0 h-full w-24 bg-linear-to-l from-slate-50/50 to-transparent pointer-events-none z-10" />
         </div>
       </div>
 
