@@ -30,10 +30,10 @@ export default function TopBar() {
     return null;
   }
 
-  const phone = settings?.phone || "+91 98310 12345";
-  const email = settings?.email || "info@sparkinnovations.in";
-  const address = settings?.address || "Kolkata, West Bengal, India";
-  const topBarText = settings?.topBarText || "Under Spark Innovations";
+  const phone = settings?.phone || "";
+  const email = settings?.email || "";
+  const address = settings?.address || "";
+  const topBarText = settings?.topBarText || "";
   
   const socialLinks = [
     { icon: <FacebookIcon size={12} />, url: settings?.social?.facebook, label: "Facebook" },

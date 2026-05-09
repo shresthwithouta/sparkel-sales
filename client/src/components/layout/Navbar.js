@@ -92,12 +92,10 @@ export default function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black uppercase tracking-tighter">
-                {settings?.websiteName ? (
+                {settings?.websiteName && (
                   <>
                     {settings.websiteName.split(' ')[0]} <span className="text-brand">{settings.websiteName.split(' ').slice(1).join(' ')}</span>
                   </>
-                ) : (
-                  <>Spark <span className="text-brand">Innovations</span></>
                 )}
               </span>
             </div>
