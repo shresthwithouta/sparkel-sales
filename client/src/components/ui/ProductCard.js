@@ -78,9 +78,11 @@ export default function ProductCard({ product }) {
               <span>{product.price?.toLocaleString("en-IN")}</span>
             </div>
             {product.mrp && (
-              <div className="flex items-center gap-1 text-slate-400">
-                <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">MRP (inclusive of all taxes)</span>
-                <span className="text-[9px] md:text-[11px] font-bold line-through flex items-center">
+              <div className="flex items-center gap-1 text-slate-400 mt-1">
+                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest">
+                  MRP <span className="hidden md:inline">(inclusive of all taxes)</span>
+                </span>
+                <span className="text-[10px] md:text-[11px] font-bold line-through flex items-center">
                   <IndianRupee size={10} className="md:w-3 md:h-3" strokeWidth={3} />
                   {product.mrp.toLocaleString("en-IN")}
                 </span>
