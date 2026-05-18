@@ -17,6 +17,7 @@ import jobRoutes from './routes/jobs.js'
 import settingsRoutes from './routes/settings.js'
 import uploadRoutes from './routes/upload.js'
 import cartRoutes from './routes/cart.js'
+import backupRoutes from './routes/backup.js'
 
 // validate required env vars before anything else
 const required = ['MONGO_URI', 'JWT_SECRET', 'CLOUDINARY_URL', 'GOOGLE_CLIENT_ID']
@@ -47,8 +48,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }))
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ limit: '10mb', extended: true }))
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true }))
 // express-mongo-sanitize can't reassign req.query in Express 5 (read-only getter)
 // so we manually sanitize only req.body
 app.use((req, res, next) => {
@@ -75,6 +76,7 @@ app.use('/api/jobs', jobRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/cart', cartRoutes)
+app.use('/api/backup', backupRoutes)
 
 // 404 handler for unknown routes
 app.use((req, res) => {
