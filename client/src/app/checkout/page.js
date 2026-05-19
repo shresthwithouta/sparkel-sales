@@ -46,6 +46,10 @@ export default function CheckoutPage() {
   });
   const [isSubmittingProof, setIsSubmittingProof] = useState(false);
 
+  // Ref guards to prevent double-submission between click and React re-render
+  const orderLockRef = useRef(false);
+  const proofLockRef = useRef(false);
+
   const totalMrp = cartItems.reduce((acc, item) => acc + ((item.mrp || item.price) * item.quantity), 0);
   const totalSavings = totalMrp - cartTotal;
 
@@ -101,6 +105,8 @@ export default function CheckoutPage() {
       }
       setStep(2);
     } else if (step === 2) {
+      if (orderLockRef.current) return;
+      orderLockRef.current = true;
       try {
         setIsProcessing(true);
         const { zipCode, ...shippingRest } = formData;
@@ -136,6 +142,7 @@ export default function CheckoutPage() {
       } catch (err) {
         showToast(err.message || "Failed to place order. Please try again.", "error");
       } finally {
+        orderLockRef.current = false;
         setIsProcessing(false);
       }
     }
@@ -165,6 +172,8 @@ export default function CheckoutPage() {
         showToast("Please fill all fields and upload the screenshot.", "error");
         return;
       }
+      if (proofLockRef.current) return;
+      proofLockRef.current = true;
       try {
         setIsSubmittingProof(true);
         // Upload screenshot image first
@@ -186,6 +195,7 @@ export default function CheckoutPage() {
       } catch (err) {
         showToast(err.message || "Failed to submit payment proof.", "error");
       } finally {
+        proofLockRef.current = false;
         setIsSubmittingProof(false);
       }
     };
