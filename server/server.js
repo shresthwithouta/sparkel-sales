@@ -21,15 +21,12 @@ import qrPaymentRoutes from './routes/qrPayments.js'
 import analyticsRoutes from './routes/analytics.js'
 
 // validate required env vars before anything else
-const required = ['MONGO_URI', 'JWT_SECRET', 'CLOUDINARY_URL']
+const required = ['MONGO_URI', 'JWT_SECRET', 'CLOUDINARY_URL', 'GOOGLE_CLIENT_ID']
 const missing = required.filter(key => !process.env[key])
 if (missing.length > 0) {
   console.error(`Missing required environment variables: ${missing.join(', ')}`)
   // process.exit crashes Vercel serverless functions — only exit in local dev
   if (!process.env.VERCEL) process.exit(1)
-}
-if (!process.env.GOOGLE_CLIENT_ID) {
-  console.warn('[Warning] GOOGLE_CLIENT_ID is not set — Google OAuth will not be available')
 }
 if (!process.env.ADMIN_EMAIL) {
   console.warn('[Warning] ADMIN_EMAIL is not set — admin inquiry/order notifications will not be sent')
