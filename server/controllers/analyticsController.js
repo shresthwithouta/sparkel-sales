@@ -1,15 +1,12 @@
-import SiteSettings from '../models/SiteSettings.js'
-
 // Get analytics data - currently returns sample/demo data
 // TODO: Integrate with Google Analytics Data API when credentials are available
 export const getAnalyticsData = async (req, res, next) => {
   try {
-    const settings = await SiteSettings.findOne()
-    const gaId = settings?.analytics?.gaMeasurementId
+    const gaId = process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID
 
     if (!gaId) {
-      return res.status(400).json({ 
-        message: 'Google Analytics not configured. Please add Measurement ID in settings.',
+      return res.status(400).json({
+        message: 'Google Analytics not configured. Please add GOOGLE_ANALYTICS_MEASUREMENT_ID to Vercel environment variables.',
         error: 'GA_NOT_CONFIGURED'
       })
     }
