@@ -1,0 +1,9 @@
+// ==============================================
+// Placeholder product SVG image
+// ==============================================
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#1a1a2e" rx="16"/>
+  <rect x="150" y="150" width="300" height="300" rx="24" fill="#16213e" stroke="#d4a843" stroke-width="2"/>
+  <path d="M260 280 L300 240 L340 280 L320 280 L320 340 L280 340 L280 280 Z" fill="#d4a843" opacity="0.6"/>
+  <text x="300" y="400" font-family="Arial, sans-serif" font-size="16" fill="#8a8a9a" text-anchor="middle">Product Image</text>
+</svg>

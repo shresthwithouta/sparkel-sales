@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -25,21 +25,31 @@ export default function TrafficSources() {
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
-  const loadData = useCallback(async () => {
-    try {
-      const result = await fetchAnalyticsData(token);
-      setData(result.data);
-    } catch (err) {
-      console.error("Error loading analytics:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
   useEffect(() => {
-    if (!token) return;
+    let cancelled = false;
+
+    const loadData = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const result = await fetchAnalyticsData(token);
+        if (!cancelled) {
+          setData(result.data);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Error loading analytics:", err);
+          setLoading(false);
+        }
+      }
+    };
+
     loadData();
-  }, [token, loadData]);
+    return () => { cancelled = true; };
+  }, [token]);
 
   if (loading) {
     return <div className="bg-slate-100 h-96 rounded-sm animate-pulse"></div>;

@@ -32,22 +32,31 @@ export default function AdminPaymentsPage() {
   const { token } = useAuth();
   const { showToast } = useToast();
 
-  const loadPayments = async () => {
-    if (!token) return;
-    try {
-      setLoading(true);
-      const data = await fetchAdminPayments(token, filter === "all" ? "" : filter);
-      setPayments(data.payments || []);
-    } catch (err) {
-      console.error("Failed to fetch payments", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (token) loadPayments();
-  }, [token, filter]); // eslint-disable-line react-hooks/exhaustive-deps
+    let cancelled = false;
+
+    const loadPayments = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await fetchAdminPayments(token, filter === "all" ? "" : filter);
+        if (!cancelled) {
+          setPayments(data.payments || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Failed to fetch payments", err);
+          setLoading(false);
+        }
+      }
+    };
+
+    loadPayments();
+    return () => { cancelled = true; };
+  }, [token, filter]);
 
   const handleAction = async (id, status) => {
     try {

@@ -1,0 +1,3 @@
+module.exports=[90294,a=>{"use strict";a.s(["default",0,function({children:a}){return a},"metadata",0,{title:"Terms & Conditions",description:"Read the terms and conditions for using Spark Innovations' website and purchasing Kutchina kitchen appliances. Shipping, returns, warranty & privacy policies.",alternates:{canonical:"/terms"},robots:{index:!0,follow:!0}}])},18197,a=>{a.n(a.i(90294))}];
+
+//# sourceMappingURL=client_src_app_terms_layout_0-wbzbb.js.map

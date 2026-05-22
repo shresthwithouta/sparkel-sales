@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -18,28 +18,38 @@ export default function AnalyticsOverview() {
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
   const { showToast } = useToast();
-
-  const loadData = useCallback(async () => {
-    if (!token) return;
-    try {
-      setLoading(true);
-      const [analyticsRes, productsRes] = await Promise.all([
-        fetchAnalyticsData(token),
-        fetchProducts({ limit: 1000 })
-      ]);
-      setAnalyticsData(analyticsRes.data || {});
-      setProducts(productsRes.products || []);
-    } catch (err) {
-      console.error("Error loading data:", err);
-      showToast("Failed to load analytics data", "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [token, showToast]);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const loadData = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const [analyticsRes, productsRes] = await Promise.all([
+          fetchAnalyticsData(token),
+          fetchProducts({ limit: 1000 })
+        ]);
+        if (!cancelled) {
+          setAnalyticsData(analyticsRes.data || {});
+          setProducts(productsRes.products || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Error loading data:", err);
+          showToast("Failed to load analytics data", "error");
+          setLoading(false);
+        }
+      }
+    };
+
     loadData();
-  }, [loadData]);
+    return () => { cancelled = true; };
+  }, [token, showToast]);
 
   const { summary = {}, usersOverTime = [], trafficSources = [], deviceCategories = [], topPages = [], weeklyComparison = [] } = analyticsData || {};
 
