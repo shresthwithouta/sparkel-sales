@@ -1,6 +1,13 @@
 import Product from '../models/Product.js'
+import { cache } from '../utils/cache.js'
 
 export const getProducts = async (req, res) => {
+  const cacheKey = `products:${JSON.stringify(req.query)}`
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    return res.json(cached)
+  }
+
   const filter = {}
   if (req.query.category) filter.category = req.query.category
   if (req.query.featured === 'true') filter.featured = true
@@ -14,10 +21,18 @@ export const getProducts = async (req, res) => {
     Product.countDocuments(filter),
   ])
 
-  res.json({ products, total, page, pages: Math.ceil(total / limit) })
+  const responseData = { products, total, page, pages: Math.ceil(total / limit) }
+  cache.set(cacheKey, responseData)
+  res.json(responseData)
 }
 
 export const searchProducts = async (req, res) => {
+  const cacheKey = `search:${JSON.stringify(req.query)}`
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    return res.json(cached)
+  }
+
   const { q } = req.query
   if (!q || typeof q !== 'string' || !q.trim())
     return res.status(400).json({ message: 'Search query q is required' })
@@ -42,13 +57,24 @@ export const searchProducts = async (req, res) => {
     Product.countDocuments(filter),
   ])
 
-  res.json({ products, total, page, pages: Math.ceil(total / limit) })
+  const responseData = { products, total, page, pages: Math.ceil(total / limit) }
+  cache.set(cacheKey, responseData)
+  res.json(responseData)
 }
 
 export const getProductBySlug = async (req, res) => {
+  const cacheKey = `product:slug:${req.params.slug}`
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    return res.json(cached)
+  }
+
   const product = await Product.findOne({ slug: req.params.slug }).lean()
   if (!product) return res.status(404).json({ message: 'Product not found' })
-  res.json({ product })
+  
+  const responseData = { product }
+  cache.set(cacheKey, responseData)
+  res.json(responseData)
 }
 
 export const createProduct = async (req, res) => {
@@ -62,6 +88,10 @@ export const createProduct = async (req, res) => {
   if (existing) return res.status(409).json({ message: 'Slug already exists' })
 
   const product = await Product.create({ name, slug, category, price, description, specs, images, featured, inStock })
+  
+  // Invalidate cache on mutations
+  cache.clear()
+  
   res.status(201).json({ product })
 }
 
@@ -76,11 +106,19 @@ export const updateProduct = async (req, res) => {
     { returnDocument: 'after', runValidators: true }
   )
   if (!product) return res.status(404).json({ message: 'Product not found' })
+
+  // Invalidate cache on mutations
+  cache.clear()
+
   res.json({ product })
 }
 
 export const deleteProduct = async (req, res) => {
   const product = await Product.findOneAndDelete({ slug: req.params.slug })
   if (!product) return res.status(404).json({ message: 'Product not found' })
+
+  // Invalidate cache on mutations
+  cache.clear()
+
   res.json({ message: 'Product deleted' })
 }

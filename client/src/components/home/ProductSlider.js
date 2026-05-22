@@ -20,9 +20,9 @@ export default function ProductSlider() {
         const data = await fetchProducts({ limit: 10 });
         const list = data?.products?.length > 0 ? data.products : SAMPLE_PRODUCTS;
         
-        // Guarantee a minimum of 6 base items to fill space and ensure horizontal overflow
+        // Guarantee a minimum of 8 base items to fill space and ensure horizontal overflow even on 4K/ultrawide screens
         let baseList = [...list];
-        while (baseList.length < 6) {
+        while (baseList.length < 8) {
           baseList = [...baseList, ...list];
         }
 
@@ -32,6 +32,9 @@ export default function ProductSlider() {
       } catch (error) {
         console.error("Error fetching products for slider:", error);
         let baseList = [...SAMPLE_PRODUCTS];
+        while (baseList.length < 8) {
+          baseList = [...baseList, ...SAMPLE_PRODUCTS];
+        }
         const repeatedList = [...baseList, ...baseList];
         setProducts(repeatedList);
       } finally {
@@ -53,8 +56,12 @@ export default function ProductSlider() {
         // Increment scrollLeft slightly every frame
         scrollContainer.scrollLeft += 0.8;
         
-        // Loop logic
-        if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        const halfScroll = scrollContainer.scrollWidth / 2;
+        // Safety threshold: loop back if we hit the half-way mark or get close to the scroll end
+        const loopThreshold = Math.min(halfScroll, maxScroll - 5);
+
+        if (scrollContainer.scrollLeft >= loopThreshold) {
           scrollContainer.scrollLeft = 0;
         }
       }
@@ -91,8 +98,11 @@ export default function ProductSlider() {
         >
           <div 
             ref={scrollRef}
-            className="flex gap-6 md:gap-8 overflow-x-auto pb-8 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
-            style={{ WebkitOverflowScrolling: 'touch' }}
+            className="flex flex-nowrap gap-6 md:gap-8 overflow-x-auto pb-8 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'auto'
+            }}
           >
             {loading ? (
               [...Array(6)].map((_, i) => (

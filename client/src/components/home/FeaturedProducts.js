@@ -32,9 +32,9 @@ export default function FeaturedProducts() {
           list = SAMPLE_PRODUCTS;
         }
 
-        // Guarantee a minimum of 6 base items to fill space and ensure horizontal overflow
+        // Guarantee a minimum of 8 base items to fill space and ensure horizontal overflow even on 4K/ultrawide screens
         let baseList = [...list];
-        while (baseList.length < 6) {
+        while (baseList.length < 8) {
           baseList = [...baseList, ...list];
         }
 
@@ -44,6 +44,9 @@ export default function FeaturedProducts() {
       } catch (error) {
         console.error("Error fetching featured products:", error);
         let baseList = [...SAMPLE_PRODUCTS];
+        while (baseList.length < 8) {
+          baseList = [...baseList, ...SAMPLE_PRODUCTS];
+        }
         const repeatedList = [...baseList, ...baseList];
         setProducts(repeatedList);
       } finally {
@@ -63,7 +66,13 @@ export default function FeaturedProducts() {
     const animate = () => {
       if (!isPaused) {
         scrollContainer.scrollLeft += 0.8;
-        if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+        
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        const halfScroll = scrollContainer.scrollWidth / 2;
+        // Safety threshold: loop back if we hit the half-way mark or get close to the scroll end
+        const loopThreshold = Math.min(halfScroll, maxScroll - 5);
+
+        if (scrollContainer.scrollLeft >= loopThreshold) {
           scrollContainer.scrollLeft = 0;
         }
       }
@@ -107,8 +116,11 @@ export default function FeaturedProducts() {
         >
           <div 
             ref={scrollRef}
-            className="flex gap-6 md:gap-8 overflow-x-auto pb-8 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
-            style={{ WebkitOverflowScrolling: 'touch' }}
+            className="flex flex-nowrap gap-6 md:gap-8 overflow-x-auto pb-8 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'auto'
+            }}
           >
             {loading ? (
               [...Array(4)].map((_, i) => (

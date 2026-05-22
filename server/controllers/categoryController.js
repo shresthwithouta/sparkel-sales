@@ -1,10 +1,19 @@
 import Category from '../models/Category.js'
 import Product from '../models/Product.js'
+import { cache } from '../utils/cache.js'
 
 export const getCategories = async (req, res, next) => {
   try {
+    const cacheKey = 'categories:all'
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      return res.json(cached)
+    }
+
     const categories = await Category.find().sort({ name: 1 })
-    res.json({ categories })
+    const responseData = { categories }
+    cache.set(cacheKey, responseData)
+    res.json(responseData)
   } catch (error) {
     next(error)
   }
@@ -22,6 +31,10 @@ export const createCategory = async (req, res, next) => {
     if (existing) return res.status(409).json({ message: 'Slug already exists' })
 
     const category = await Category.create({ name, slug, icon, description })
+    
+    // Invalidate cache on mutations
+    cache.clear()
+    
     res.status(201).json({ category })
   } catch (error) {
     next(error)
@@ -45,6 +58,10 @@ export const updateCategory = async (req, res, next) => {
       { returnDocument: 'after', runValidators: true }
     )
     if (!category) return res.status(404).json({ message: 'Category not found' })
+    
+    // Invalidate cache on mutations
+    cache.clear()
+    
     res.json({ category })
   } catch (error) {
     next(error)
@@ -59,6 +76,10 @@ export const deleteCategory = async (req, res, next) => {
     }
     const category = await Category.findOneAndDelete({ slug: req.params.slug })
     if (!category) return res.status(404).json({ message: 'Category not found' })
+    
+    // Invalidate cache on mutations
+    cache.clear()
+    
     res.json({ message: 'Category deleted' })
   } catch (error) {
     next(error)
