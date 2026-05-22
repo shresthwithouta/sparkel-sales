@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { fetchProducts } from "@/lib/api";
+import { SAMPLE_PRODUCTS } from "@/lib/constants";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Link from "next/link";
 import ProductCard from "@/components/ui/ProductCard";
@@ -18,15 +19,33 @@ export default function FeaturedProducts() {
     const getProducts = async () => {
       try {
         const data = await fetchProducts({ featured: true });
-        if (data && data.products && data.products.length > 0) {
-          // Double the list for continuous premium loop
-          setProducts([...data.products, ...data.products]);
-        } else {
-          setProducts([]);
+        let list = data?.products;
+
+        // If no featured products exist in the database, fetch regular products to keep section populated
+        if (!list || list.length === 0) {
+          const allProductsData = await fetchProducts({ limit: 10 });
+          list = allProductsData?.products;
         }
+
+        // If still no products, use high-quality fallback products
+        if (!list || list.length === 0) {
+          list = SAMPLE_PRODUCTS;
+        }
+
+        // Guarantee a minimum of 6 base items to fill space and ensure horizontal overflow
+        let baseList = [...list];
+        while (baseList.length < 6) {
+          baseList = [...baseList, ...list];
+        }
+
+        // Double the list for seamless infinite loop scroll
+        const repeatedList = [...baseList, ...baseList];
+        setProducts(repeatedList);
       } catch (error) {
         console.error("Error fetching featured products:", error);
-        setProducts([]);
+        let baseList = [...SAMPLE_PRODUCTS];
+        const repeatedList = [...baseList, ...baseList];
+        setProducts(repeatedList);
       } finally {
         setLoading(false);
       }

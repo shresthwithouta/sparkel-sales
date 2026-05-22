@@ -36,16 +36,37 @@ if (!process.env.ADMIN_EMAIL) {
 const app = express()
 const port = process.env.PORT || 4000
 
+// Start database connection in background immediately on cold-start
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+}).then(() => {
+  console.log('Initial background MongoDB connection established');
+}).catch(err => {
+  console.error('Initial background MongoDB connection error:', err);
+});
+
 // database connection middleware for serverless robustness
 app.use(async (req, res, next) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Connecting to MongoDB...');
-      await mongoose.connect(process.env.MONGO_URI, {
-        serverSelectionTimeoutMS: 5000,
-      });
-      console.log('MongoDB connected');
+    const state = mongoose.connection.readyState;
+    if (state === 1) {
+      return next();
     }
+    if (state === 2) {
+      // Connection is in progress, wait for it or proceed after a short timeout
+      await Promise.race([
+        new Promise(resolve => mongoose.connection.once('connected', resolve)),
+        new Promise(resolve => setTimeout(resolve, 2000))
+      ]);
+      return next();
+    }
+    
+    // If disconnected or disconnecting (state 0 or 3), initiate connection
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log('MongoDB connected');
     next();
   } catch (err) {
     console.error('MongoDB connection error in middleware:', err);

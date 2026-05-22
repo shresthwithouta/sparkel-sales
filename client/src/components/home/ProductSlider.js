@@ -19,11 +19,21 @@ export default function ProductSlider() {
       try {
         const data = await fetchProducts({ limit: 10 });
         const list = data?.products?.length > 0 ? data.products : SAMPLE_PRODUCTS;
-        // Double the products for a seamless loop
-        setProducts([...list, ...list]);
+        
+        // Guarantee a minimum of 6 base items to fill space and ensure horizontal overflow
+        let baseList = [...list];
+        while (baseList.length < 6) {
+          baseList = [...baseList, ...list];
+        }
+
+        // Double the list for seamless infinite loop scroll
+        const repeatedList = [...baseList, ...baseList];
+        setProducts(repeatedList);
       } catch (error) {
         console.error("Error fetching products for slider:", error);
-        setProducts([...SAMPLE_PRODUCTS, ...SAMPLE_PRODUCTS]);
+        let baseList = [...SAMPLE_PRODUCTS];
+        const repeatedList = [...baseList, ...baseList];
+        setProducts(repeatedList);
       } finally {
         setLoading(false);
       }
